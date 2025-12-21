@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   typescript: {
     // Enable strict mode for better type safety
     ignoreBuildErrors: false,
@@ -11,7 +8,14 @@ const nextConfig = {
     // Don't ignore ESLint errors during builds
     ignoreDuringBuilds: false,
   },
-  // PWA configuration will be added later
+  // Experimental features
+  experimental: {
+    // Enable server components logging
+    logging: {
+      level: 'verbose',
+    },
+  },
+  // PWA configuration will be added later with next-pwa
   // pwa: {
   //   dest: 'public',
   //   register: true,
