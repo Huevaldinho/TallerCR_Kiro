@@ -71,6 +71,9 @@
     "glob": "^10.0.0",
     "rimraf": "^5.0.0"
   },
+  "notes": {
+    "deprecation-warnings": "Some npm warnings come from transitive dependencies (swagger-jsdoc, swagger-ui-react, jest-environment-jsdom, eslint@8). These will be resolved when we upgrade to Next.js 15 which supports ESLint 9 and newer jsdom."
+  },
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
