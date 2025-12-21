@@ -74,12 +74,13 @@ This document summarizes what has been implemented and what the Kiro agent now k
 ### 6. ✅ Project Configuration
 - Next.js 14 with TypeScript
 - Tailwind CSS with design system
-- Docker development environment
+- Docker development environment with PostgreSQL
 - Jest testing framework
 - ESLint configuration (with compatibility fixes)
 - Git workflow with dev branch
 - Standalone output for optimized Docker builds
 - MCP configuration for GitHub integration
+- PostgreSQL + Prisma + NextAuth.js stack (no external dependencies)
 
 ## What the Kiro Agent Now Knows
 
@@ -271,10 +272,10 @@ src/
 ## Technology Stack
 
 - **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Backend**: PostgreSQL, Prisma ORM, NextAuth.js
 - **Testing**: Jest, fast-check (property-based)
 - **Precision**: big.js (monetary calculations)
 - **Validation**: Zod, react-hook-form
-- **Database**: Supabase (PostgreSQL) - future
 - **CI/CD**: GitHub Actions
 - **Containerization**: Docker, Docker Compose
 
@@ -343,6 +344,23 @@ src/
 **Root Cause**: `security` object incorrectly nested inside `mcpServers`
 **Solution**: Moved `security` to root level of JSON configuration
 **Learning**: MCP configuration structure matters for proper parsing
+
+### 9. Architecture Decision: PostgreSQL + Prisma Instead of Supabase
+**Decision**: Replace Supabase with local PostgreSQL + Prisma + NextAuth.js
+**Reason**: User wanted to avoid external service dependencies and stay within Docker workflow
+**Benefits**:
+  - No external accounts needed
+  - Complete offline development
+  - Full control of database
+  - Easier testing and CI/CD
+  - Consistent with Docker-first approach
+**Changes Made**:
+  - Updated Requirement 19 (Database and Authentication Security)
+  - Modified design.md architecture and technology stack
+  - Updated tasks.md for Prisma setup (Milestone 1.4, 2.1)
+  - Configured docker-compose.yml with PostgreSQL service
+  - Updated environment variables (.env, .env.example)
+**Impact**: All development now runs locally without external dependencies
 
 ## How We Worked Together
 
@@ -431,8 +449,9 @@ The Kiro agent is fully equipped to continue development following the establish
 
 **Last Updated**: December 21, 2024
 **Status**: Foundation Complete - Ready for Milestone 2
-**Next Task**: Supabase Setup and Authentication
-**Total Session Time**: ~3 hours of collaborative development
-**Problems Solved**: 8 major issues resolved
-**Commits Made**: 15+ commits with meaningful messages
+**Next Task**: PostgreSQL + Prisma Setup (Milestone 1.4)
+**Total Session Time**: ~4 hours of collaborative development
+**Problems Solved**: 9 major issues resolved
+**Commits Made**: 17+ commits with meaningful messages
 **Tests Passing**: 75+ tests with 100% critical path coverage
+**Architecture**: PostgreSQL + Prisma + NextAuth.js (fully local, no external services)
