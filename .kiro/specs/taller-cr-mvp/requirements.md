@@ -299,18 +299,18 @@ El sistema resuelve problemas críticos de los talleres: fricción con clientes 
 6. THE System SHALL cache critical assets: fonts, CSS, JavaScript, common images
 7. THE System SHALL save form progress locally to prevent data loss on connection interruption
 
-### Requirement 19: Supabase Integration and Data Security
+### Requirement 19: Database and Authentication Security
 
 **User Story:** As a system administrator, I want secure data storage and authentication with multi-tenant isolation, so that taller data is protected and users can log in securely.
 
 #### Acceptance Criteria
 
-1. THE System SHALL use Supabase for database storage of: talleres, vehicles, clients, service orders, quotations, invoices
-2. THE System SHALL use Supabase Authentication for user login and session management with JWT tokens
-3. WHEN storing data, THE System SHALL use Supabase client libraries for all database operations
-4. THE System SHALL implement Row Level Security (RLS) policies in Supabase ensuring: talleres can only access their own data, clients can only access orders via valid tokens
-5. THE System SHALL store authentication tokens securely using httpOnly cookies or secure localStorage
-6. THE System SHALL enforce HTTPS for all connections
+1. THE System SHALL use PostgreSQL for database storage of: talleres, vehicles, clients, service orders, quotations, invoices
+2. THE System SHALL use NextAuth.js for user login and session management with JWT tokens
+3. WHEN storing data, THE System SHALL use Prisma ORM for all database operations
+4. THE System SHALL implement application-level multi-tenant isolation ensuring: talleres can only access their own data, clients can only access orders via valid tokens
+5. THE System SHALL store authentication tokens securely using httpOnly cookies
+6. THE System SHALL enforce HTTPS for all connections in production
 7. THE System SHALL implement rate limiting of 100 requests per minute per IP address
 8. THE System SHALL sanitize all user inputs to prevent XSS and SQL injection attacks
 9. THE System SHALL hash and partially mask sensitive data: cédulas show only last 4 digits in lists

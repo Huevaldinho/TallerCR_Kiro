@@ -1,11 +1,33 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: taller-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-taller}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taller_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-taller_cr}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - taller-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taller}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Next.js Development Server
   app:
     build:
       context: .
       target: dev
+    container_name: taller-app
     ports:
       - "3000:3000"
     volumes:
@@ -16,37 +38,25 @@ services:
       - NODE_ENV=development
       - NEXT_TELEMETRY_DISABLED=1
       - WATCHPACK_POLLING=true
-      # Supabase (will be configured via .env.local)
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      # Database
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-taller}:${POSTGRES_PASSWORD:-taller_dev_password}@postgres:5432/${POSTGRES_DB:-taller_cr}
+      # NextAuth
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      # App Configuration
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
     stdin_open: true
     tty: true
     networks:
       - taller-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
-
-  # Supabase Local (Optional - for complete local development)
-  supabase:
-    image: supabase/supabase:latest
-    ports:
-      - "54321:54321"  # Supabase Studio
-      - "54322:54322"  # PostgreSQL
-      - "54323:54323"  # PostgREST
-      - "54324:54324"  # Realtime
-      - "54325:54325"  # Storage
-    environment:
-      - POSTGRES_PASSWORD=your-super-secret-and-long-postgres-password
-    volumes:
-      - supabase_data:/var/lib/postgresql/data
-    networks:
-      - taller-network
-    profiles:
-      - local-supabase
 
 networks:
   taller-network:
     driver: bridge
 
 volumes:
-  supabase_data:
+  postgres_data:

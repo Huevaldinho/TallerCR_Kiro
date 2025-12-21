@@ -11,7 +11,7 @@ The system architecture is organized around five core domains:
 4. **Invoice Generation** - ATV v4.3 compliant electronic invoicing
 5. **Client Communication** - Magic Links and WhatsApp integration
 
-The application uses Supabase as the backend-as-a-service platform, providing PostgreSQL database storage, authentication, and real-time capabilities. All monetary calculations are performed in Costa Rican Colones (CRC) with automatic 13% IVA calculation.
+The application uses PostgreSQL as the database with Prisma ORM for type-safe database access, and NextAuth.js for authentication. All services run in Docker containers for consistent development and deployment. All monetary calculations are performed in Costa Rican Colones (CRC) with automatic 13% IVA calculation.
 
 ## Architecture
 
@@ -33,9 +33,9 @@ graph TB
     end
     
     subgraph "Data Layer"
-        SB[Supabase Client]
+        PRISMA[Prisma Client]
         DB[(PostgreSQL)]
-        AUTH[Supabase Auth]
+        AUTH[NextAuth.js]
     end
     
     subgraph "External Services"
@@ -48,14 +48,14 @@ graph TB
     PWA --> IG
     PWA --> ML
     
-    VR --> SB
-    SO --> SB
-    QE --> SB
-    IG --> SB
-    ML --> SB
+    VR --> PRISMA
+    SO --> PRISMA
+    QE --> PRISMA
+    IG --> PRISMA
+    ML --> PRISMA
     
-    SB --> DB
-    SB --> AUTH
+    PRISMA --> DB
+    PWA --> AUTH
     
     ML --> WA
     
@@ -73,18 +73,19 @@ graph TB
 - HTTP Client: Supabase Client
 
 **Backend:**
-- BaaS: Supabase (PostgreSQL + Auth + Realtime)
-- Authentication: Supabase Auth (JWT)
-- Storage: Supabase Storage (for future image uploads)
+- Database: PostgreSQL (Docker)
+- ORM: Prisma
+- Authentication: NextAuth.js (JWT)
+- Container Orchestration: Docker Compose
 
 **PWA:**
 - Service Worker: Workbox
 - Manifest: next-pwa plugin
 
 **Deployment:**
-- Hosting: Vercel
-- CDN: Vercel Edge Network
-- Database: Supabase Cloud
+- Hosting: Docker containers
+- Database: PostgreSQL in Docker
+- Development: Docker Compose
 
 ### Directory Structure
 
@@ -109,7 +110,8 @@ taller-cr/
 │   │   ├── orders/            # Order-specific components
 │   │   └── layout/            # Layout components
 │   ├── lib/
-│   │   ├── supabase/          # Supabase client & utilities
+│   │   ├── prisma/            # Prisma client & utilities
+│   │   ├── auth/              # NextAuth configuration
 │   │   ├── fiscal/            # Tax calculation engine
 │   │   ├── invoice/           # ATV invoice generator
 │   │   └── utils/             # Helper functions
@@ -121,9 +123,10 @@ taller-cr/
 │   ├── manifest.json
 │   ├── icons/
 │   └── sw.js
-├── supabase/
+├── prisma/
+│   ├── schema.prisma
 │   ├── migrations/
-│   └── seed.sql
+│   └── seed.ts
 └── package.json
 ```
 
@@ -1099,7 +1102,7 @@ const PATTERNS = {
 ### Database Errors
 
 **Connection Errors:**
-- Supabase connection timeout → Display: "Error de conexión. Verifique su internet."
+- PostgreSQL connection timeout → Display: "Error de conexión. Verifique su internet."
 - Retry strategy: 3 attempts with exponential backoff (1s, 2s, 4s)
 
 **Constraint Violations:**
@@ -1143,7 +1146,7 @@ const PATTERNS = {
 ### Logging and Monitoring
 
 **Error Logging Strategy:**
-- All errors logged to Supabase with structured JSON format
+- All errors logged to database with structured JSON format
 - Log levels: ERROR (critical), WARN (recoverable), INFO (audit trail)
 - Logged data: timestamp, user_id, taller_id, error_type, error_message, stack_trace, request_context
 
@@ -1229,7 +1232,7 @@ test('fiscal calculations are always correct', () => {
 4. **Token Generation**: Test UUID format, uniqueness, expiry calculation
 5. **Invoice JSON**: Test structure matches ATV v4.3 schema
 6. **Search Functionality**: Test case-insensitivity, hyphen handling
-7. **Multi-Tenant Isolation**: Test RLS policies prevent cross-taller access
+7. **Multi-Tenant Isolation**: Test application-level policies prevent cross-taller access
 
 **Edge Cases to Test:**
 - Empty strings, null values, undefined
@@ -1251,7 +1254,7 @@ test('fiscal calculations are always correct', () => {
 - Mock external services (WhatsApp, email)
 
 **Database Integration Tests:**
-- Test RLS policies with different user contexts
+- Test multi-tenant isolation with different user contexts
 - Test foreign key constraints
 - Test unique constraints
 - Test transaction rollbacks on errors
@@ -1290,7 +1293,7 @@ test('fiscal calculations are always correct', () => {
 1. **SQL Injection**: Test all input fields with SQL injection payloads
 2. **XSS**: Test text inputs with script tags and event handlers
 3. **CSRF**: Verify all state-changing operations require valid tokens
-4. **RLS Bypass**: Attempt to access other taller's data with manipulated queries
+4. **Multi-Tenant Bypass**: Attempt to access other taller's data with manipulated queries
 5. **Token Guessing**: Verify UUID v4 tokens are not predictable
 6. **Expired Token Access**: Verify expired tokens are rejected
 
@@ -1361,8 +1364,8 @@ npm run test:watch        # Watch mode for TDD
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typescript": "^5.0.0",
-    "@supabase/supabase-js": "^2.38.0",
-    "@supabase/auth-helpers-nextjs": "^0.8.0",
+    "@prisma/client": "^5.7.0",
+    "next-auth": "^4.24.0",
     "big.js": "^6.2.1",
     "@types/big.js": "^6.2.2",
     "react-hook-form": "^7.48.0",
@@ -1375,7 +1378,9 @@ npm run test:watch        # Watch mode for TDD
     "date-fns": "^2.30.0",
     "tailwindcss": "^3.3.0",
     "autoprefixer": "^10.4.0",
-    "postcss": "^8.4.0"
+    "postcss": "^8.4.0",
+    "bcrypt": "^5.1.1",
+    "@types/bcrypt": "^5.0.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -1388,12 +1393,15 @@ npm run test:watch        # Watch mode for TDD
     "@testing-library/jest-dom": "^6.0.0",
     "fast-check": "^3.13.0",
     "next-pwa": "^5.6.0",
-    "workbox-webpack-plugin": "^7.0.0"
+    "workbox-webpack-plugin": "^7.0.0",
+    "prisma": "^5.7.0"
   }
 }
 ```
 
 **Key Library Purposes:**
+- **@prisma/client**: Type-safe database client for PostgreSQL
+- **next-auth**: Authentication for Next.js with JWT support
 - **big.js**: Arbitrary-precision decimal arithmetic for fiscal calculations
 - **react-input-mask**: Automatic input formatting for cédulas and phone numbers
 - **zod**: Runtime type validation and schema definition
@@ -1401,11 +1409,12 @@ npm run test:watch        # Watch mode for TDD
 - **uuid**: UUID v4 generation for Magic Link tokens
 - **fast-check**: Property-based testing framework
 - **next-pwa**: PWA support for Next.js
+- **bcrypt**: Password hashing for secure authentication
 
 ### Phase 1: Core Infrastructure (Week 1-2)
 1. Next.js project setup with TypeScript and Tailwind
-2. Supabase project creation and database schema
-3. Authentication setup with Supabase Auth
+2. PostgreSQL setup in Docker with Prisma
+3. Authentication setup with NextAuth.js
 4. PWA configuration (manifest, service worker)
 5. Design system implementation (colors, typography, components)
 

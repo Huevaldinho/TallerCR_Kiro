@@ -98,38 +98,49 @@ This implementation plan follows a milestone-based approach, building the system
   - Configure react-input-mask patterns
   - _Requirements: 4.4, 4.5, 4.9, 4.10_
 
-### 1.4 Supabase Setup
+### 1.4 Database Setup with Prisma
 
-- [ ] 1.4.1 Create Supabase project and configure client
-  - Set up Supabase project
-  - Create lib/supabase/client.ts with environment variables
-  - Configure server and client-side clients
-  - _Requirements: 19.1, 19.2, 19.3_
+- [ ] 1.4.1 Set up PostgreSQL in Docker
+  - Add PostgreSQL service to docker-compose.yml
+  - Configure environment variables for database connection
+  - Create database initialization script
+  - _Requirements: 19.1_
 
+- [ ] 1.4.2 Install and configure Prisma
+  - Install @prisma/client and prisma dev dependency
+  - Initialize Prisma with `npx prisma init`
+  - Configure prisma/schema.prisma with PostgreSQL datasource
+  - _Requirements: 19.3_
 
-- [ ] 1.4.2 Create database schema migration
-  - Create supabase/migrations/001_initial_schema.sql
-  - Tables: talleres, vehicles, clients, service_orders, service_line_items, order_tokens, services_catalog, order_status_history
-  - All monetary fields as INTEGER (centimos)
-  - Indexes on: placa, order_id, client_phone, taller_id
+- [ ] 1.4.3 Create Prisma schema with all models
+  - Define models: Taller, Vehicle, Client, ServiceOrder, ServiceLineItem, OrderToken, ServicesCatalog, OrderStatusHistory
+  - All monetary fields as Int (centimos)
+  - Add indexes on: placa, orderNumber, clientPhone, tallerId
   - _Requirements: 19.1, 19.10_
 
-- [ ] 1.4.3 Implement Row Level Security (RLS) policies
-  - Taller isolation: talleres can only access their own data
-  - Public access: clients can view orders via valid tokens
-  - Create policies for all tables
+- [ ] 1.4.4 Generate Prisma client and run migrations
+  - Run `npx prisma migrate dev --name init`
+  - Generate Prisma client
+  - Create lib/prisma/client.ts with singleton pattern
+  - _Requirements: 19.3_
+
+- [ ] 1.4.5 Implement multi-tenant isolation middleware
+  - Create Prisma middleware for taller_id filtering
+  - Ensure all queries automatically filter by current taller
+  - Create utility functions for safe queries
   - _Requirements: 19.4_
 
-- [ ] 1.4.4 Write property tests for multi-tenant isolation
+- [ ] 1.4.6 Write property tests for multi-tenant isolation
   - **Property 27: Multi-Tenant Data Isolation**
   - Create test talleres and data
   - Verify queries don't return other taller's data
   - _Requirements: 19.4_
 
-- [ ] 1.4.5 Seed database with CABYS catalog
-  - Create supabase/seed.sql with 20+ common services
+- [ ] 1.4.7 Create database seed script
+  - Create prisma/seed.ts with 20+ common services
   - Include: cambio aceite, frenos, suspensión, etc.
   - Each with valid 13-digit CABYS code and suggested price
+  - Run with `npx prisma db seed`
   - _Requirements: 6.1, 6.2_
 
 ---
@@ -137,18 +148,26 @@ This implementation plan follows a milestone-based approach, building the system
 ## Milestone 2: Authentication & Taller Management
 
 
-### 2.1 Authentication Setup
+### 2.1 Authentication Setup with NextAuth.js
 
-- [ ] 2.1.1 Configure Supabase Auth
-  - Set up authentication providers
-  - Configure JWT tokens and session management
-  - Create auth middleware for protected routes
+- [ ] 2.1.1 Install and configure NextAuth.js
+  - Install next-auth and bcrypt dependencies
+  - Create app/api/auth/[...nextauth]/route.ts
+  - Configure JWT strategy and session handling
+  - Set up environment variables (NEXTAUTH_SECRET, NEXTAUTH_URL)
   - _Requirements: 19.2, 19.5_
 
 - [ ] 2.1.2 Create authentication context and hooks
-  - Implement useAuth hook
+  - Implement useAuth hook with useSession
   - Handle login, logout, session state
+  - Create auth middleware for protected routes
   - _Requirements: 19.2_
+
+- [ ] 2.1.3 Create Prisma user model and credentials provider
+  - Add User model to Prisma schema
+  - Link User to Taller (one-to-one relationship)
+  - Implement credentials provider with bcrypt password hashing
+  - _Requirements: 19.2, 19.5_
 
 ### 2.2 Taller Registration
 
