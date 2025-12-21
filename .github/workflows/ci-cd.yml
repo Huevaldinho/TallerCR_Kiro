@@ -40,15 +40,7 @@ jobs:
       #   continue-on-error: true
 
       - name: Run tests
-        run: npm test -- --no-watch --coverage
-        
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella
-        continue-on-error: true
+        run: npm test -- --no-watch
 
   build:
     name: Build Docker Image
