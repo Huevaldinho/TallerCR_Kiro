@@ -46,6 +46,8 @@ COPY . .
 RUN mkdir -p public
 
 # Generate Prisma Client before build
+# Set a dummy DATABASE_URL for prisma generate (only needs schema, not actual connection)
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN npx prisma generate
 
 # Build the application
