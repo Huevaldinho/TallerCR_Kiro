@@ -21,8 +21,6 @@
     "docker:down": "docker-compose down",
     "docker:clean": "docker-compose down -v --rmi all",
     "docker:logs": "docker-compose logs -f app",
-    "supabase:local": "docker-compose --profile local-supabase up -d",
-    "supabase:stop": "docker-compose --profile local-supabase down",
     "audit:fix": "npm audit fix",
     "update:check": "npm outdated",
     "setup": "npm install && npm run type-check && npm run lint",
@@ -31,8 +29,6 @@
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
     "@prisma/client": "^6.19.1",
-    "@supabase/auth-helpers-nextjs": "^0.10.0",
-    "@supabase/supabase-js": "^2.46.1",
     "@types/bcrypt": "^6.0.0",
     "@types/big.js": "^6.2.2",
     "@types/react-input-mask": "^3.0.5",
@@ -75,8 +71,8 @@
     "rimraf": "^5.0.0"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
