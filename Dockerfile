@@ -35,7 +35,11 @@ CMD ["npm", "run", "dev"]
 # Production builder
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+
+# Install ALL dependencies (including devDependencies) for build
+COPY package.json package-lock.json* ./
+RUN npm ci --legacy-peer-deps
+
 COPY . .
 
 # Build the application

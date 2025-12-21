@@ -2,7 +2,9 @@
 
 ## Application Status: ✅ Running on http://localhost:3000
 
-The Docker container is now running and Next.js has detected all routes.
+The Docker container is now running and all dashboard routes are working correctly.
+
+**Issue Fixed**: The route group folder was renamed from `(dashboard)` to `dashboard` because route groups with parentheses in Next.js don't add to the URL path - they're only for organization.
 
 ---
 

@@ -17,14 +17,20 @@ export async function GET() {
   const now = Date.now()
   const uptime = Math.floor((now - startTime) / 1000)
 
-  const checks = {
-    api: 'ok' as const,
-    database: 'pending' as const,
-    cache: 'pending' as const,
+  const checks: { [key: string]: 'ok' | 'pending' | 'error' } = {
+    api: 'ok',
+    database: 'pending',
+    cache: 'pending',
   }
 
   const failedChecks = Object.values(checks).filter((c) => c === 'error')
-  const status = failedChecks.length > 0 ? 'unhealthy' : 'healthy'
+  const pendingChecks = Object.values(checks).filter((c) => c === 'pending')
+  
+  const status = failedChecks.length > 0 
+    ? 'unhealthy' 
+    : pendingChecks.length > 0 
+    ? 'degraded' 
+    : 'healthy'
 
   const response: HealthCheckResponse = {
     status,
