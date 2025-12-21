@@ -9,15 +9,16 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-taller}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taller_dev_password}
       POSTGRES_DB: ${POSTGRES_DB:-taller_cr}
+      POSTGRES_INITDB_ARGS: "-E UTF8"
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - taller-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taller}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taller} -d ${POSTGRES_DB:-taller_cr}"]
       interval: 10s
       timeout: 5s
       retries: 5
