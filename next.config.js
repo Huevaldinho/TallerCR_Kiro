@@ -9,12 +9,7 @@ const nextConfig = {
     ignoreDuringBuilds: false,
   },
   // Experimental features
-  experimental: {
-    // Enable server components logging
-    logging: {
-      level: 'verbose',
-    },
-  },
+  experimental: {},
   // PWA configuration will be added later with next-pwa
   // pwa: {
   //   dest: 'public',
