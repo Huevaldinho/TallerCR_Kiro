@@ -42,6 +42,9 @@ RUN npm ci --legacy-peer-deps
 
 COPY . .
 
+# Ensure public directory exists (Next.js requires it)
+RUN mkdir -p public
+
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
