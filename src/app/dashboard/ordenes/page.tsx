@@ -101,12 +101,30 @@ export default function OrdenesPage() {
                     <div className="text-xs text-gray-500 truncate max-w-[150px]">{order.motivoIngreso}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{order.vehicle.placa}</div>
-                    <div className="text-xs text-gray-500">{order.vehicle.marca} {order.vehicle.modelo}</div>
+                    {order.vehicle.id ? (
+                      <Link href={`/dashboard/vehiculos/${order.vehicle.id}`} className="hover:underline">
+                        <div className="text-sm font-medium text-blue-600 hover:text-blue-800">{order.vehicle.placa}</div>
+                        <div className="text-xs text-gray-500">{order.vehicle.marca} {order.vehicle.modelo}</div>
+                      </Link>
+                    ) : (
+                      <>
+                        <div className="text-sm font-medium text-gray-900">{order.vehicle.placa}</div>
+                        <div className="text-xs text-gray-500">{order.vehicle.marca} {order.vehicle.modelo}</div>
+                      </>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{order.client.nombreCompleto}</div>
-                    <div className="text-xs text-gray-500">{order.client.telefono}</div>
+                    {order.client.id ? (
+                      <Link href={`/dashboard/clientes/${order.client.id}`} className="hover:underline">
+                        <div className="text-sm text-blue-600 hover:text-blue-800">{order.client.nombreCompleto}</div>
+                        <div className="text-xs text-gray-500">{order.client.telefono}</div>
+                      </Link>
+                    ) : (
+                      <>
+                        <div className="text-sm text-gray-900">{order.client.nombreCompleto}</div>
+                        <div className="text-xs text-gray-500">{order.client.telefono}</div>
+                      </>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusConfig[order.status].color}`}>

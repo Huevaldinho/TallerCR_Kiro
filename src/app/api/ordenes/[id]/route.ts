@@ -22,6 +22,7 @@ export async function GET(
         client: true,
         lineItems: { orderBy: { numeroLinea: 'asc' } },
         statusHistory: { orderBy: { changedAt: 'desc' } },
+        images: { orderBy: { createdAt: 'desc' } },
         taller: {
           select: {
             nombre: true,
@@ -53,52 +54,64 @@ export async function PATCH(
     const body = await request.json()
     const { status, notes } = body
 
-    const order = await prisma.serviceOrder.findUnique({
-      where: { id },
-      select: { status: true }
-    })
+    // ✅ TRANSACCIÓN: Actualizar estado de forma atómica
+    const updated = await prisma.$transaction(async (tx) => {
+      const order = await tx.serviceOrder.findUnique({
+        where: { id },
+        select: { status: true }
+      })
 
-    if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
-    }
-
-    // Validate status transition
-    const validTransitions: Record<OrderStatus, OrderStatus[]> = {
-      BORRADOR: ['ENVIADA'],
-      ENVIADA: ['APROBADA', 'BORRADOR'],
-      APROBADA: ['FACTURADA', 'BORRADOR'],
-      FACTURADA: ['COMPLETADA'],
-      COMPLETADA: [],
-    }
-
-    if (!validTransitions[order.status].includes(status)) {
-      return NextResponse.json({ 
-        error: `No se puede cambiar de ${order.status} a ${status}` 
-      }, { status: 400 })
-    }
-
-    const updated = await prisma.serviceOrder.update({
-      where: { id },
-      data: {
-        status,
-        statusHistory: {
-          create: {
-            fromStatus: order.status,
-            toStatus: status,
-            notes: notes || `Estado cambiado a ${status}`,
-          }
-        }
-      },
-      include: {
-        vehicle: true,
-        client: true,
-        lineItems: true,
+      if (!order) {
+        throw new Error('Order not found')
       }
+
+      // Validate status transition
+      const validTransitions: Record<OrderStatus, OrderStatus[]> = {
+        BORRADOR: ['ENVIADA'],
+        ENVIADA: ['APROBADA', 'BORRADOR'],
+        APROBADA: ['FACTURADA', 'BORRADOR'],
+        FACTURADA: ['COMPLETADA'],
+        COMPLETADA: [],
+      }
+
+      if (!validTransitions[order.status].includes(status)) {
+        throw new Error(`No se puede cambiar de ${order.status} a ${status}`)
+      }
+
+      return await tx.serviceOrder.update({
+        where: { id },
+        data: {
+          status,
+          statusHistory: {
+            create: {
+              fromStatus: order.status,
+              toStatus: status,
+              notes: notes || `Estado cambiado a ${status}`,
+            }
+          }
+        },
+        include: {
+          vehicle: true,
+          client: true,
+          lineItems: true,
+        }
+      })
     })
 
     return NextResponse.json({ order: updated })
   } catch (error) {
     console.error('Order PATCH error:', error)
+    
+    // ✅ MEJOR MANEJO DE ERRORES
+    if (error instanceof Error) {
+      if (error.message === 'Order not found') {
+        return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+      }
+      if (error.message.startsWith('No se puede cambiar')) {
+        return NextResponse.json({ error: error.message }, { status: 400 })
+      }
+    }
+    
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

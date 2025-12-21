@@ -19,32 +19,19 @@ export async function GET() {
       return NextResponse.json({ error: 'Taller not found' }, { status: 404 })
     }
 
+    // ✅ CORRECTO: Usar include para traer todas las relaciones
     const orders = await prisma.serviceOrder.findMany({
       where: { tallerId },
       orderBy: { createdAt: 'desc' },
       include: {
-        vehicle: { select: { placa: true, marca: true, modelo: true } },
-        client: { select: { nombreCompleto: true, telefono: true } },
+        vehicle: true,
+        client: true,
         lineItems: true,
+        images: true,
       }
     })
 
-    return NextResponse.json({
-      orders: orders.map(order => ({
-        id: order.id,
-        orderNumber: order.orderNumber,
-        status: order.status,
-        motivoIngreso: order.motivoIngreso,
-        vehicle: order.vehicle,
-        client: order.client,
-        subtotal: order.subtotalCentimos,
-        iva: order.ivaCentimos,
-        total: order.totalCentimos,
-        lineItems: order.lineItems,
-        createdAt: order.createdAt,
-        updatedAt: order.updatedAt,
-      }))
-    })
+    return NextResponse.json({ orders })
   } catch (error) {
     console.error('Orders GET error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -61,9 +48,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { vehicleId, clientId, motivoIngreso, lineItems } = body
 
-    // Generate order number
-    const count = await prisma.serviceOrder.count({ where: { tallerId } })
-    const orderNumber = `ORD-${new Date().getFullYear()}-${String(count + 1).padStart(3, '0')}`
+    // ✅ VALIDAR: Verificar que vehicle y client existen
+    const [vehicle, client] = await Promise.all([
+      prisma.vehicle.findUnique({ where: { id: vehicleId } }),
+      prisma.client.findUnique({ where: { id: clientId } })
+    ])
+
+    if (!vehicle) {
+      return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 })
+    }
+
+    if (!client) {
+      return NextResponse.json({ error: 'Client not found' }, { status: 404 })
+    }
 
     // Calculate totals
     let subtotalCentimos = 0
@@ -87,26 +84,33 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    const order = await prisma.serviceOrder.create({
-      data: {
-        tallerId,
-        vehicleId,
-        clientId,
-        orderNumber,
-        motivoIngreso,
-        subtotalCentimos,
-        ivaCentimos,
-        totalCentimos: subtotalCentimos + ivaCentimos,
-        lineItems: { create: processedLineItems },
-        statusHistory: {
-          create: { toStatus: 'BORRADOR', notes: 'Orden creada' }
+    // ✅ TRANSACCIÓN: Crear orden con line items de forma atómica
+    const order = await prisma.$transaction(async (tx) => {
+      // Generate order number dentro de la transacción
+      const count = await tx.serviceOrder.count({ where: { tallerId } })
+      const orderNumber = `ORD-${new Date().getFullYear()}-${String(count + 1).padStart(3, '0')}`
+
+      return await tx.serviceOrder.create({
+        data: {
+          tallerId,
+          vehicleId,
+          clientId,
+          orderNumber,
+          motivoIngreso,
+          subtotalCentimos,
+          ivaCentimos,
+          totalCentimos: subtotalCentimos + ivaCentimos,
+          lineItems: { create: processedLineItems },
+          statusHistory: {
+            create: { toStatus: 'BORRADOR', notes: 'Orden creada' }
+          }
+        },
+        include: {
+          vehicle: true,
+          client: true,
+          lineItems: true,
         }
-      },
-      include: {
-        vehicle: true,
-        client: true,
-        lineItems: true,
-      }
+      })
     })
 
     return NextResponse.json({ order }, { status: 201 })

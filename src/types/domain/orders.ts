@@ -26,7 +26,16 @@ export interface LineItemInput {
   precioUnitarioCentimos: number
 }
 
+export interface OrderImage {
+  id: string
+  url: string
+  caption?: string | null
+  imageType: string
+  createdAt: string
+}
+
 export interface OrderVehicle {
+  id?: string
   placa: string
   marca: string
   modelo: string
@@ -35,6 +44,7 @@ export interface OrderVehicle {
 }
 
 export interface OrderClient {
+  id?: string
   nombreCompleto: string
   telefono: string
   email?: string | null
@@ -59,6 +69,7 @@ export interface Order {
   ivaCentimos: number | null
   totalCentimos: number | null
   lineItems: LineItem[]
+  images?: OrderImage[]
   createdAt: string
   updatedAt?: string
 }
@@ -66,6 +77,7 @@ export interface Order {
 export interface OrderDetail extends Order {
   taller: OrderTaller
   statusHistory?: OrderStatusHistory[]
+  images?: OrderImage[]
 }
 
 export interface OrderStatusHistory {

@@ -1,394 +1,622 @@
 # Taller Pro CR
 
-[![CI/CD Pipeline](https://github.com/Huevaldinho/TallerCR_Kiro/actions/workflows/ci-cd.yml/badge.svg?branch=dev)](https://github.com/Huevaldinho/TallerCR_Kiro/actions/workflows/ci-cd.yml)
-[![codecov](https://codecov.io/gh/Huevaldinho/TallerCR_Kiro/branch/dev/graph/badge.svg)](https://codecov.io/gh/Huevaldinho/TallerCR_Kiro)
+Sistema de gestión para talleres mecánicos en Costa Rica con cumplimiento fiscal automático (IVA + CABYS).
 
-Sistema de gestión para talleres mecánicos en Costa Rica con cumplimiento fiscal automático (IVA + CABYS) y generación de facturas electrónicas ATV v4.3.
+## 📋 Estado del Proyecto
 
-## 🚀 Características Principales
+**Versión:** MVP en desarrollo  
+**Última actualización:** Diciembre 2024
 
-- ✅ **Cotizaciones Profesionales** con cálculo automático de IVA (13%)
-- ✅ **Códigos CABYS** pre-cargados y validados
-- ✅ **Magic Links** para aprobación de clientes vía WhatsApp
-- ✅ **Facturación Electrónica** compatible con Hacienda (ATV v4.3)
-- ✅ **PWA Mobile-First** optimizada para talleres
-- ✅ **Multi-tenant** con aislamiento de datos por taller
+### ✅ Funcionalidades Implementadas
 
-## 🛠️ Stack Tecnológico
+- **Gestión de Clientes**
+  - Registro con tipos de identificación CR (Física, Jurídica, DIMEX, NITE, Pasaporte)
+  - Listado, búsqueda, detalles y edición
+  - Historial de órdenes por cliente
+  - Estadísticas (total órdenes, total facturado)
 
-- **Frontend**: Next.js 14 (App Router) + TypeScript
-- **Estilos**: Tailwind CSS
-- **Backend**: Supabase (PostgreSQL + Auth + Realtime)
-- **Precisión Monetaria**: big.js (evita errores de redondeo)
-- **Validación**: Zod + React Hook Form
-- **Testing**: Jest + fast-check (property-based testing)
-- **PWA**: next-pwa + Workbox
+- **Gestión de Vehículos**
+  - Registro con placas CR (Particular, Taxi, Moto)
+  - Listado, búsqueda, detalles y edición
+  - Historial de órdenes por vehículo
+  - Estadísticas (total órdenes, total facturado)
 
-## 🏗️ Desarrollo
+- **Gestión de Órdenes de Servicio**
+  - Creación de órdenes con múltiples servicios
+  - Cálculo automático de IVA (13%)
+  - Códigos CABYS para servicios
+  - Estados: BORRADOR → ENVIADA → APROBADA → FACTURADA → COMPLETADA
+  - Historial de cambios de estado
+  - Soporte para imágenes (modelo creado, pendiente upload)
+
+- **API REST Completa**
+  - Endpoints CRUD para clientes, vehículos y órdenes
+  - Documentación Swagger en `/api-docs`
+  - Validaciones y manejo de errores
+
+- **Dashboard**
+  - Estadísticas generales
+  - Navegación entre entidades
+  - Links clickeables entre órdenes, clientes y vehículos
+
+### 🚧 Pendiente de Implementar
+
+- Upload de imágenes para órdenes
+- Facturación electrónica (integración con Hacienda)
+- Magic Links para aprobación de clientes
+- Autenticación y multi-tenant
+- PWA y modo offline
+
+---
+
+## 🚀 Inicio Rápido
 
 ### Prerrequisitos
 
-- **Docker** y **Docker Compose** (Recomendado - evita problemas de dependencias)
-- **O** Node.js 18+ y npm (para desarrollo local)
-- Git
+- **Docker** y **Docker Compose** (Recomendado)
+- **O** Node.js 18+ y PostgreSQL 16
 
-### 🐳 Setup con Docker (Recomendado)
-
-**Para nuevos desarrolladores - Setup automático:**
+### Setup con Docker (Recomendado)
 
 ```bash
-# Clonar repositorio
+# 1. Clonar repositorio
+git clone https://github.com/Huevaldinho/TallerCR_Kiro.git
+cd TallerCR_Kiro
+
+# 2. Cambiar a rama de desarrollo
+git checkout dev
+
+# 3. Copiar variables de entorno
+cp .env.example .env
+
+# 4. Iniciar aplicación
+docker-compose up --build
+
+# La aplicación estará disponible en:
+# - Frontend: http://localhost:3000
+# - API Docs: http://localhost:3000/api-docs
+# - PostgreSQL: localhost:5433
+```
+
+### Comandos Útiles
+
+```bash
+# Desarrollo
+docker-compose up --build          # Iniciar aplicación
+docker-compose down                # Detener aplicación
+docker-compose logs -f taller-app  # Ver logs
+
+# Base de datos
+docker exec taller-app npx prisma migrate dev    # Ejecutar migraciones
+docker exec taller-app npx prisma db seed        # Poblar con datos de prueba
+docker exec taller-app npx prisma studio         # Abrir Prisma Studio
+
+# Tests
+docker exec taller-app npm test                  # Ejecutar tests
+docker exec taller-app npm run test:watch       # Tests en modo watch
+docker exec taller-app npm run lint              # Linter
+```
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+TallerCR_Kiro/
+├── .github/                    # GitHub Actions (CI/CD)
+│   └── workflows/
+│       └── ci-cd.yml          # Pipeline automático
+├── .kiro/                      # Configuración de Kiro AI
+│   ├── specs/                 # Especificaciones de features
+│   └── steering/              # Guías de desarrollo
+├── prisma/                     # Base de datos
+│   ├── schema.prisma          # Esquema de la BD
+│   ├── migrations/            # Migraciones
+│   └── seed.ts                # Datos de prueba
+├── src/
+│   ├── app/                   # Next.js App Router
+│   │   ├── api/              # API REST endpoints
+│   │   │   ├── clientes/     # CRUD clientes
+│   │   │   ├── vehiculos/    # CRUD vehículos
+│   │   │   ├── ordenes/      # CRUD órdenes
+│   │   │   ├── dashboard/    # Estadísticas
+│   │   │   ├── health/       # Health check
+│   │   │   └── docs/         # Swagger JSON
+│   │   ├── dashboard/        # Páginas del dashboard
+│   │   │   ├── clientes/     # Gestión de clientes
+│   │   │   ├── vehiculos/    # Gestión de vehículos
+│   │   │   └── ordenes/      # Gestión de órdenes
+│   │   └── api-docs/         # Swagger UI
+│   ├── components/            # Componentes React
+│   │   ├── ui/               # Componentes base
+│   │   ├── forms/            # Formularios
+│   │   └── layout/           # Layout components
+│   ├── lib/                   # Utilidades
+│   │   ├── prisma/           # Cliente Prisma
+│   │   ├── swagger/          # Configuración Swagger
+│   │   └── fiscal/           # Cálculos fiscales (futuro)
+│   └── types/                 # TypeScript types
+│       ├── domain/           # Tipos de dominio
+│       └── api/              # Tipos de API
+├── docker-compose.yml         # Docker para desarrollo
+├── Dockerfile                 # Imagen Docker
+├── package.json               # Dependencias
+├── tsconfig.json              # TypeScript config
+├── tailwind.config.ts         # Tailwind CSS config
+└── README.md                  # Este archivo
+```
+
+---
+
+## 🗄️ Base de Datos
+
+### Modelos Principales
+
+```prisma
+// Taller (workshop)
+model Taller {
+  id                String   @id @default(uuid())
+  nombre            String
+  cedulaJuridica    String   @unique
+  telefono          String
+  email             String   @unique
+  // ... relaciones
+}
+
+// Cliente
+model Client {
+  id                    String              @id @default(uuid())
+  nombreCompleto        String
+  tipoIdentificacion    TipoIdentificacion  // FISICA, JURIDICA, DIMEX, NITE, PASAPORTE
+  numeroIdentificacion  String
+  telefono              String
+  email                 String?
+  // ... relaciones
+}
+
+// Vehículo
+model Vehicle {
+  id          String   @id @default(uuid())
+  placa       String   // ABC-123, TX-1234, M-12345
+  marca       String
+  modelo      String
+  año         Int
+  color       String?
+  kilometraje Int?
+  // ... relaciones
+}
+
+// Orden de Servicio
+model ServiceOrder {
+  id               String       @id @default(uuid())
+  orderNumber      String       @unique  // ORD-2024-001
+  status           OrderStatus  @default(BORRADOR)
+  motivoIngreso    String?
+  subtotalCentimos Int?         // Almacenado en centimos
+  ivaCentimos      Int?         // IVA 13%
+  totalCentimos    Int?
+  // ... relaciones
+}
+
+// Línea de Servicio
+model ServiceLineItem {
+  id                      String  @id @default(uuid())
+  numeroLinea             Int
+  descripcion             String
+  cabysCode               String  // Código CABYS (13 dígitos)
+  cantidad                Int
+  precioUnitarioCentimos  Int
+  subtotalCentimos        Int
+  ivaCentimos             Int
+  totalLineaCentimos      Int
+}
+```
+
+### Migraciones
+
+```bash
+# Crear nueva migración
+docker exec taller-app npx prisma migrate dev --name nombre_migracion
+
+# Aplicar migraciones
+docker exec taller-app npx prisma migrate deploy
+
+# Resetear base de datos (desarrollo)
+docker exec taller-app npx prisma migrate reset
+```
+
+---
+
+## 🔌 API REST
+
+### Documentación Interactiva
+
+Accede a la documentación Swagger en: **http://localhost:3000/api-docs**
+
+### Endpoints Principales
+
+#### Clientes
+
+```bash
+GET    /api/clientes           # Listar clientes
+POST   /api/clientes           # Crear cliente
+GET    /api/clientes/[id]      # Obtener cliente
+PATCH  /api/clientes/[id]      # Actualizar cliente
+```
+
+#### Vehículos
+
+```bash
+GET    /api/vehiculos          # Listar vehículos (soporta ?placa=ABC)
+POST   /api/vehiculos          # Crear vehículo
+GET    /api/vehiculos/[id]     # Obtener vehículo
+PATCH  /api/vehiculos/[id]     # Actualizar vehículo
+```
+
+#### Órdenes
+
+```bash
+GET    /api/ordenes            # Listar órdenes
+POST   /api/ordenes            # Crear orden
+GET    /api/ordenes/[id]       # Obtener orden
+PATCH  /api/ordenes/[id]       # Actualizar estado de orden
+```
+
+#### Dashboard
+
+```bash
+GET    /api/dashboard/stats    # Estadísticas generales
+```
+
+#### Health Check
+
+```bash
+GET    /api/health             # Estado de la aplicación
+```
+
+### Ejemplos de Uso (PowerShell)
+
+```powershell
+# Listar clientes
+Invoke-RestMethod -Uri "http://localhost:3000/api/clientes" -Method GET
+
+# Crear vehículo
+$body = @{
+  placa = "ABC-123"
+  marca = "Toyota"
+  modelo = "Corolla"
+  año = 2020
+  color = "Blanco"
+  kilometraje = 45000
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:3000/api/vehiculos" -Method POST -Body $body -ContentType "application/json"
+
+# Crear orden
+$body = @{
+  vehicleId = "uuid-del-vehiculo"
+  clientId = "uuid-del-cliente"
+  motivoIngreso = "Cambio de aceite"
+  lineItems = @(
+    @{
+      descripcion = "Cambio de aceite de motor"
+      cabysCode = "8527101010000"
+      cantidad = 1
+      precioUnitarioCentimos = 1500000  # ₡15,000.00
+    }
+  )
+} | ConvertTo-Json -Depth 3
+
+Invoke-RestMethod -Uri "http://localhost:3000/api/ordenes" -Method POST -Body $body -ContentType "application/json"
+```
+
+---
+
+## 🎨 Stack Tecnológico
+
+### Frontend
+- **Next.js 14** (App Router) - Framework React
+- **TypeScript** - Tipado estático
+- **Tailwind CSS** - Estilos
+- **React Hook Form** - Manejo de formularios
+
+### Backend
+- **Next.js API Routes** - API REST
+- **Prisma** - ORM para PostgreSQL
+- **PostgreSQL 16** - Base de datos
+- **Swagger** - Documentación de API
+
+### DevOps
+- **Docker** - Contenedorización
+- **GitHub Actions** - CI/CD
+- **Jest** - Testing unitario
+- **fast-check** - Property-based testing
+
+---
+
+## 🧪 Testing
+
+### Ejecutar Tests
+
+```bash
+# Todos los tests
+docker exec taller-app npm test
+
+# Tests en modo watch
+docker exec taller-app npm run test:watch
+
+# Tests con cobertura
+docker exec taller-app npm test -- --coverage
+
+# Solo property-based tests
+docker exec taller-app npm run test:property
+```
+
+### Estructura de Tests
+
+```
+src/
+├── lib/
+│   └── fiscal/
+│       └── __tests__/
+│           ├── calculations.test.ts      # Tests unitarios
+│           └── calculations.property.ts  # Property-based tests
+└── components/
+    └── ui/
+        └── __tests__/
+            └── Button.test.tsx
+```
+
+---
+
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions
+
+El proyecto usa GitHub Actions para automatizar testing y deployment:
+
+**Flujo:**
+1. Push a `dev` → Ejecuta tests
+2. Tests pasan → Construye imagen Docker
+3. Imagen se sube a GitHub Container Registry
+
+**Ver estado:** https://github.com/Huevaldinho/TallerCR_Kiro/actions
+
+### Branch Protection
+
+La rama `dev` requiere:
+- ✅ Tests pasen
+- ✅ Build exitoso
+- ✅ Code review aprobado
+
+**Documentación completa:** [CI_CD_GUIDE.md](./CI_CD_GUIDE.md)
+
+---
+
+## 💰 Precisión Monetaria
+
+### Almacenamiento en Centimos
+
+Para evitar errores de redondeo, todos los montos se almacenan como **enteros en centimos**:
+
+```typescript
+// ₡15,000.00 se almacena como 1500000 centimos
+const precioEnCentimos = 1500000
+const precioDisplay = precioEnCentimos / 100  // 15000.00
+
+// Cálculo de IVA (13%)
+const iva = Math.round(subtotalCentimos * 0.13)
+```
+
+### Formato de Moneda
+
+```typescript
+function formatCurrency(centimos: number | null): string {
+  if (!centimos) return '₡0'
+  return `₡${(centimos / 100).toLocaleString('es-CR')}`
+}
+
+// Ejemplo: formatCurrency(1500000) → "₡15,000"
+```
+
+---
+
+## 🇨🇷 Formatos Costa Rica
+
+### Tipos de Identificación
+
+| Tipo | Formato | Ejemplo |
+|------|---------|---------|
+| Cédula Física | `#-####-####` | `1-1234-5678` |
+| Cédula Jurídica | `#-###-######` | `3-101-123456` |
+| DIMEX | `############` | `123456789012` |
+| NITE | `##########` | `1234567890` |
+| Pasaporte | Alfanumérico | `AB123456` |
+
+### Placas de Vehículos
+
+| Tipo | Formato | Ejemplo |
+|------|---------|---------|
+| Particular | `ABC-123` | `ABC-123` |
+| Taxi | `TX-####` | `TX-1234` |
+| Motocicleta | `A-#####` | `M-12345` |
+
+### Teléfonos
+
+- **Formato:** `+506 ####-####`
+- **Ejemplo:** `+506 8888-8888`
+
+### Códigos CABYS
+
+- **Formato:** 13 dígitos
+- **Ejemplo:** `8527101010000`
+- **Uso:** Clasificación de bienes y servicios para facturación electrónica
+
+---
+
+## 📚 Documentación para el Equipo
+
+### Guías de Desarrollo
+
+1. **[development-workflow.md](.kiro/steering/development-workflow.md)**
+   - Comandos de PowerShell para Windows
+   - Estructura del proyecto
+   - Patrones de diseño
+   - Testing strategy
+
+2. **[AGENT_WORKFLOW.md](.kiro/steering/AGENT_WORKFLOW.md)**
+   - Workflow de commits
+   - CI/CD pipeline
+   - Manejo de errores
+   - Best practices
+
+3. **[CI_CD_GUIDE.md](./CI_CD_GUIDE.md)**
+   - Configuración de GitHub Actions
+   - Branch protection
+   - Troubleshooting
+   - Deployment
+
+4. **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)**
+   - Documentación completa de API
+   - Ejemplos de uso
+   - Esquemas de datos
+
+5. **[DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)**
+   - Problemas comunes con Docker
+   - Soluciones paso a paso
+
+### Especificaciones (Specs)
+
+Las especificaciones del proyecto están en `.kiro/specs/taller-cr-mvp/`:
+
+- **requirements.md** - Requisitos del sistema (EARS format)
+- **design.md** - Diseño de arquitectura y componentes
+- **tasks.md** - Lista de tareas de implementación
+
+---
+
+## 🤝 Guía para Nuevos Desarrolladores
+
+### 1. Setup Inicial (5 minutos)
+
+```bash
+# Clonar y entrar al proyecto
 git clone https://github.com/Huevaldinho/TallerCR_Kiro.git
 cd TallerCR_Kiro
 
 # Cambiar a rama de desarrollo
 git checkout dev
 
-# Setup automático (Linux/Mac)
-chmod +x scripts/setup.sh
-./scripts/setup.sh
+# Copiar variables de entorno
+cp .env.example .env
 
-# Setup automático (Windows)
-scripts\setup.bat
-```
-
-**Setup manual:**
-
-```bash
-# 1. Copiar variables de entorno
-cp .env.example .env.local
-
-# 2. Editar .env.local con tus credenciales de Supabase
-# NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima
-
-# 3. Iniciar desarrollo con Docker
-make dev
-# O alternativamente:
+# Iniciar con Docker
 docker-compose up --build
 ```
 
-**Comandos Docker disponibles:**
+### 2. Verificar que Todo Funciona
 
 ```bash
-make dev              # Iniciar desarrollo
-make test             # Ejecutar tests
-make logs             # Ver logs de la aplicación
-make shell            # Acceder al contenedor
-make supabase         # Iniciar Supabase local (opcional)
-make clean            # Limpiar contenedores e imágenes
-make help             # Ver todos los comandos
+# Abrir en navegador
+http://localhost:3000
+
+# Ver documentación de API
+http://localhost:3000/api-docs
+
+# Verificar health check
+curl http://localhost:3000/api/health
 ```
 
-### 💻 Desarrollo Local (Sin Docker)
+### 3. Explorar el Código
+
+1. **Dashboard:** `src/app/dashboard/`
+2. **API:** `src/app/api/`
+3. **Componentes:** `src/components/`
+4. **Base de datos:** `prisma/schema.prisma`
+
+### 4. Hacer Cambios
 
 ```bash
-# Instalar dependencias
-npm install
+# Crear rama para tu feature
+git checkout -b feature/mi-feature
 
-# Configurar variables de entorno
-cp .env.example .env.local
-# Editar .env.local con tus credenciales
+# Hacer cambios...
 
-# Ejecutar en modo desarrollo
-npm run dev
+# Ejecutar tests
+docker exec taller-app npm test
+
+# Commit y push
+git add .
+git commit -m "feat: descripción del cambio"
+git push origin feature/mi-feature
+
+# Crear Pull Request en GitHub
 ```
 
-### Scripts Disponibles
+### 5. Recursos Útiles
+
+- **Prisma Docs:** https://www.prisma.io/docs
+- **Next.js Docs:** https://nextjs.org/docs
+- **Tailwind CSS:** https://tailwindcss.com/docs
+- **TypeScript:** https://www.typescriptlang.org/docs
+
+---
+
+## 🐛 Troubleshooting
+
+### Docker no inicia
 
 ```bash
-# Desarrollo
-make dev             # Servidor de desarrollo (Docker)
-npm run dev          # Servidor de desarrollo (local)
-make test            # Tests (Docker)
-npm run test         # Tests (local)
+# Limpiar contenedores e imágenes
+docker-compose down -v
+docker system prune -a
 
-# Utilidades
-make lint            # Linter
-make format          # Formatear código
-make clean           # Limpiar Docker
-make setup           # Setup inicial
-
-# Base de datos
-make supabase        # Supabase local
-make supabase-stop   # Detener Supabase
-
-# Producción
-make build           # Build de producción
-make prod            # Ejecutar producción
+# Reiniciar Docker Desktop
+# Volver a iniciar
+docker-compose up --build
 ```
 
-## 🐳 ¿Por qué Docker?
-
-### Ventajas para el Equipo
-
-- **✅ Consistencia**: Mismo entorno en todos los equipos
-- **✅ Sin problemas de dependencias**: No más "funciona en mi máquina"
-- **✅ Setup rápido**: Nuevos desarrolladores productivos en minutos
-- **✅ Aislamiento**: No interfiere con otras versiones de Node.js
-- **✅ Fácil limpieza**: `make clean` elimina todo sin rastros
-
-### Comparación
-
-| Aspecto | Docker | Local |
-|---------|--------|-------|
-| Setup inicial | 5 minutos | 15-30 minutos |
-| Problemas de versiones | ❌ Ninguno | ⚠️ Frecuentes |
-| Consistencia del equipo | ✅ 100% | ⚠️ Variable |
-| Limpieza del sistema | ✅ Completa | ⚠️ Parcial |
-| Requisitos | Solo Docker | Node.js + dependencias |
-
-## 🚀 Despliegue
-
-### Con Docker (Recomendado)
+### Base de datos no conecta
 
 ```bash
-# Build imagen de producción
-docker-compose -f docker-compose.prod.yml build
+# Verificar que PostgreSQL está corriendo
+docker-compose ps
 
-# Ejecutar en producción
-docker-compose -f docker-compose.prod.yml up -d
+# Ver logs de PostgreSQL
+docker-compose logs postgres
+
+# Resetear base de datos
+docker exec taller-app npx prisma migrate reset
 ```
 
-### Colores
-
-- **Primario**: `#3B82F6` (Azul) - Botones principales y acciones clave
-- **Secundario**: `#10B981` (Verde) - Estados de éxito y confirmaciones
-- **Estados de Órdenes**:
-  - BORRADOR: Amarillo (`#eab308`)
-  - ENVIADA: Azul (`#3b82f6`)
-  - APROBADA: Verde (`#10b981`)
-  - FACTURADA: Gris oscuro (`#6b7280`)
-  - COMPLETADA: Gris claro (`#9ca3af`)
-
-### Tipografía
-
-- **Fuente**: Inter
-- **Texto del cuerpo**: 14px
-- **Encabezados**: 24px
-
-### Componentes
-
-Todos los componentes siguen el principio mobile-first con tamaños mínimos de toque de 44px.
-
-## 🏛️ Arquitectura
-
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Rutas de autenticación
-│   ├── (dashboard)/       # Dashboard del taller
-│   ├── orden/             # Portal público del cliente
-│   └── api/               # API routes
-├── components/
-│   ├── ui/                # Componentes reutilizables
-│   ├── forms/             # Componentes de formularios
-│   ├── orders/            # Componentes específicos de órdenes
-│   └── layout/            # Componentes de layout
-├── lib/
-│   ├── supabase/          # Cliente y utilidades de Supabase
-│   ├── fiscal/            # Motor de cálculos fiscales
-│   ├── invoice/           # Generador de facturas ATV
-│   └── validation/        # Validadores de formatos CR
-├── types/                 # Definiciones de tipos TypeScript
-└── hooks/                 # Custom React hooks
-```
-
-## 💰 Precisión Monetaria
-
-Para evitar errores de redondeo en cálculos fiscales:
-
-- Todos los montos se almacenan como **enteros (centimos)** en la base de datos
-- Cálculos usando **big.js** para precisión arbitraria
-- IVA calculado como: `Math.round(subtotal_centimos * 0.13)`
-- Conversión para display: `centimos / 100`
-
-```typescript
-// Ejemplo: ₡150.00 se almacena como 15000 centimos
-const precioEnCentimos = 15000;
-const precioDisplay = precioEnCentimos / 100; // 150.00
-```
-
-## 🇨🇷 Formatos Costa Rica
-
-### Identificaciones
-
-- **Cédula Física**: `#-####-####` (9 dígitos)
-- **Cédula Jurídica**: `#-###-######` (10 dígitos)
-- **DIMEX**: `############` (11-12 dígitos)
-- **NITE**: `##########` (10 dígitos)
-- **Pasaporte**: Alfanumérico 6-20 caracteres
-
-### Placas de Vehículos
-
-- **Particulares**: `ABC-123`
-- **Taxis**: `TX-1234`
-- **Motocicletas**: `A-12345`
-
-### Teléfonos
-
-- **Formato**: `+506 ####-####`
-
-## 🧪 Testing
-
-### Tests Unitarios
+### Tests fallan
 
 ```bash
-npm run test
+# Limpiar cache de Jest
+docker exec taller-app npm test -- --clearCache
+
+# Reinstalar dependencias
+docker-compose down
+docker-compose up --build
 ```
 
-### Tests Basados en Propiedades
+### Más problemas
 
-```bash
-npm run test:property
-```
+Ver: [DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)
 
-Utilizamos **fast-check** para generar casos de prueba aleatorios y verificar propiedades universales:
+---
 
-- Cálculos fiscales siempre exactos
-- Validación de formatos costarricenses
-- Aislamiento multi-tenant
-- Máquina de estados de órdenes
+## 📞 Contacto y Soporte
 
-### Cobertura de Tests
+- **Issues:** https://github.com/Huevaldinho/TallerCR_Kiro/issues
+- **Pull Requests:** https://github.com/Huevaldinho/TallerCR_Kiro/pulls
+- **Documentación:** Este README y archivos en `/docs`
 
-```bash
-npm run test -- --coverage
-```
-
-Objetivo: > 80% de cobertura en código crítico
-
-## 🔄 CI/CD Pipeline
-
-El proyecto utiliza **GitHub Actions** para automatizar testing y despliegue:
-
-### Flujo Automático
-
-1. **Push a rama `dev`** → Ejecuta tests automáticamente
-2. **Tests pasan** → Construye imagen Docker
-3. **Tests fallan** → Pipeline se detiene, notifica al desarrollador
-4. **Imagen construida** → Se sube a GitHub Container Registry
-
-### Branch Protection
-
-La rama `dev` está protegida y requiere:
-- ✅ Todos los tests pasen
-- ✅ Docker image se construya exitosamente
-- ✅ Aprobación de código (code review)
-- ✅ Rama actualizada con main
-
-**Ver:** [.github/BRANCH_PROTECTION.md](.github/BRANCH_PROTECTION.md) para configuración detallada
-
-### Verificar Estado
-
-- **GitHub Actions**: https://github.com/Huevaldinho/TallerCR_Kiro/actions
-- **Container Registry**: https://github.com/Huevaldinho/TallerCR_Kiro/pkgs/container/TallerCR_Kiro
-
-### Health Check Endpoint
-
-Verifica que la aplicación está funcionando correctamente:
-
-```bash
-# Full health check
-curl http://localhost:3000/api/health | jq
-
-# Respuesta (200 OK):
-{
-  "status": "healthy",
-  "timestamp": "2024-12-21T10:30:00Z",
-  "version": "0.1.0",
-  "environment": "development",
-  "uptime": 3600,
-  "checks": {
-    "api": "ok",
-    "database": "pending",
-    "cache": "pending"
-  }
-}
-
-# Liveness probe (para Kubernetes)
-curl -I http://localhost:3000/api/health
-```
-
-### Documentación Completa
-
-Ver **[CI_CD_GUIDE.md](./CI_CD_GUIDE.md)** para:
-- Detalles del pipeline
-- Troubleshooting
-- Best practices
-- Monitoreo
-- Despliegue
-
-## 📱 PWA
-
-La aplicación es una Progressive Web App que puede instalarse en dispositivos móviles:
-
-- **Offline-first**: Funciona sin conexión
-- **Instalable**: Se puede agregar a la pantalla de inicio
-- **Responsive**: Optimizada para móviles
-- **Service Worker**: Cache inteligente de recursos
-
-## 🔐 Seguridad
-
-- **Multi-tenant**: Aislamiento completo de datos por taller
-- **RLS**: Row Level Security en Supabase
-- **Tokens UUID v4**: Para Magic Links no adivinables
-- **Validación**: Cliente y servidor con Zod
-- **HTTPS**: Obligatorio en producción
-
-## 🚀 Despliegue
-
-### Vercel (Recomendado)
-
-```bash
-# Conectar con Vercel
-npx vercel
-
-# Configurar variables de entorno en Vercel dashboard
-# NEXT_PUBLIC_SUPABASE_URL
-# NEXT_PUBLIC_SUPABASE_ANON_KEY
-# SUPABASE_SERVICE_ROLE_KEY
-```
-
-### Docker
-
-```bash
-# Build imagen de producción
-docker build -t taller-pro-cr .
-
-# Ejecutar contenedor
-docker run -p 3000:3000 taller-pro-cr
-```
-
-## 📋 Roadmap
-
-### MVP1 (Actual)
-- ✅ Registro de talleres y vehículos
-- ✅ Cotizaciones con CABYS
-- ✅ Magic Links para aprobación
-- ✅ Generación de JSON ATV v4.3
-
-### MVP2 (Próximo)
-- 🔄 Integración real con Hacienda
-- 🔄 Upload de fotos de daños
-- 🔄 Dashboard analytics
-- 🔄 Multi-sucursal
-
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crear rama feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit cambios (`git commit -m 'feat: agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abrir Pull Request
+---
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
-
-## 📞 Soporte
-
-Para soporte técnico o preguntas sobre el proyecto, crear un issue en GitHub.
+Este proyecto está bajo la Licencia MIT.
 
 ---
 

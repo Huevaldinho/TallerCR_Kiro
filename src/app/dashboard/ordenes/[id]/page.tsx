@@ -110,13 +110,25 @@ export default function OrderDetailPage() {
       {/* Info Cards */}
       <div className="grid gap-6 md:grid-cols-3">
         <InfoCard title="Vehículo">
-          <p className="text-xl font-bold text-gray-900">{order.vehicle.placa}</p>
+          {order.vehicle.id ? (
+            <Link href={`/dashboard/vehiculos/${order.vehicle.id}`} className="text-xl font-bold text-blue-600 hover:text-blue-800 hover:underline">
+              {order.vehicle.placa}
+            </Link>
+          ) : (
+            <p className="text-xl font-bold text-gray-900">{order.vehicle.placa}</p>
+          )}
           <p className="text-gray-600">{order.vehicle.marca} {order.vehicle.modelo} ({order.vehicle.año})</p>
           {order.vehicle.color && <p className="text-sm text-gray-500">Color: {order.vehicle.color}</p>}
         </InfoCard>
 
         <InfoCard title="Cliente">
-          <p className="text-lg font-semibold text-gray-900">{order.client.nombreCompleto}</p>
+          {order.client.id ? (
+            <Link href={`/dashboard/clientes/${order.client.id}`} className="text-lg font-semibold text-blue-600 hover:text-blue-800 hover:underline">
+              {order.client.nombreCompleto}
+            </Link>
+          ) : (
+            <p className="text-lg font-semibold text-gray-900">{order.client.nombreCompleto}</p>
+          )}
           <p className="text-gray-600">{order.client.telefono}</p>
           {order.client.email && <p className="text-sm text-gray-500">{order.client.email}</p>}
           <p className="text-xs text-gray-400 mt-1">ID: {order.client.numeroIdentificacion}</p>
@@ -133,6 +145,30 @@ export default function OrderDetailPage() {
 
       {/* Totals */}
       <TotalsCard subtotal={order.subtotalCentimos} iva={order.ivaCentimos} total={order.totalCentimos} />
+
+      {/* Images Gallery */}
+      {order.images && order.images.length > 0 && (
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Imágenes de la Orden</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {order.images.map((image) => (
+              <div key={image.id} className="relative group">
+                <img 
+                  src={image.url} 
+                  alt={image.caption || 'Imagen de orden'} 
+                  className="w-full h-48 object-cover rounded-lg border border-gray-200 hover:border-blue-500 transition-colors cursor-pointer"
+                />
+                {image.caption && (
+                  <p className="mt-1 text-xs text-gray-500 truncate">{image.caption}</p>
+                )}
+                <span className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                  {image.imageType}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -13,6 +13,34 @@ const DEMO_TALLER_ID = async () => {
   return taller?.id
 }
 
+/**
+ * @swagger
+ * /api/dashboard/stats:
+ *   get:
+ *     tags:
+ *       - Dashboard
+ *     summary: Get dashboard statistics
+ *     description: Returns dashboard statistics including pending orders, today's revenue, vehicle count, client count, and recent orders
+ *     responses:
+ *       200:
+ *         description: Dashboard statistics retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DashboardStats'
+ *       404:
+ *         description: Taller not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function GET() {
   try {
     const tallerId = await DEMO_TALLER_ID()

@@ -156,6 +156,9 @@ model ServiceOrder {
   invoiceJson       Json?
   claveNumerica     String?       @db.VarChar(50)
   
+  // Images
+  images            OrderImage[]
+  
   // Relations
   lineItems         ServiceLineItem[]
   tokens            OrderToken[]
@@ -255,4 +258,24 @@ model OrderStatusHistory {
   changedAt   DateTime      @default(now())
 
   @@index([orderId])
+}
+
+// ============================================
+// ORDER IMAGES
+// ============================================
+
+model OrderImage {
+  id          String        @id @default(uuid())
+  orderId     String
+  order       ServiceOrder  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  url         String        // URL or path to the image
+  caption     String?       // Optional description
+  imageType   String        @default("general") // general, vehicle, before, after, damage, repair
+  uploadedBy  String?       // User who uploaded (future auth)
+  
+  createdAt   DateTime      @default(now())
+
+  @@index([orderId])
+  @@index([imageType])
 }

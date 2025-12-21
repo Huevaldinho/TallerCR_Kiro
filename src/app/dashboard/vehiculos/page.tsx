@@ -83,29 +83,31 @@ export default function VehiculosPage() {
 
 function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="text-xl font-bold text-gray-900">{vehicle.placa}</h3>
-          <p className="text-gray-600">{vehicle.marca} {vehicle.modelo}</p>
-          <p className="text-sm text-gray-500">Año: {vehicle.año}</p>
+    <Link href={`/dashboard/vehiculos/${vehicle.id}`}>
+      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 hover:text-blue-600">{vehicle.placa}</h3>
+            <p className="text-gray-600">{vehicle.marca} {vehicle.modelo}</p>
+            <p className="text-sm text-gray-500">Año: {vehicle.año}</p>
+          </div>
+          <div className="rounded-lg bg-purple-100 p-2">
+            <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
         </div>
-        <div className="rounded-lg bg-purple-100 p-2">
-          <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
+        <div className="mt-4 flex items-center justify-between text-sm">
+          <div className="text-gray-500">
+            {vehicle.color && <span>Color: {vehicle.color}</span>}
+            {vehicle.kilometraje && <span className="ml-2">• {vehicle.kilometraje.toLocaleString()} km</span>}
+          </div>
+          <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+            {vehicle.ordersCount} órdenes
+          </span>
         </div>
       </div>
-      <div className="mt-4 flex items-center justify-between text-sm">
-        <div className="text-gray-500">
-          {vehicle.color && <span>Color: {vehicle.color}</span>}
-          {vehicle.kilometraje && <span className="ml-2">• {vehicle.kilometraje.toLocaleString()} km</span>}
-        </div>
-        <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-          {vehicle.ordersCount} órdenes
-        </span>
-      </div>
-    </div>
+    </Link>
   )
 }
 
