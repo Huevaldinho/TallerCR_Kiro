@@ -25,11 +25,13 @@ Sistema de gestión para talleres mecánicos en Costa Rica con cumplimiento fisc
 
 ### Prerrequisitos
 
-- Node.js 18+
-- Docker y Docker Compose (opcional)
+- **Docker** y **Docker Compose** (Recomendado - evita problemas de dependencias)
+- **O** Node.js 18+ y npm (para desarrollo local)
 - Git
 
-### Instalación Local
+### 🐳 Setup con Docker (Recomendado)
+
+**Para nuevos desarrolladores - Setup automático:**
 
 ```bash
 # Clonar repositorio
@@ -39,40 +41,111 @@ cd TallerCR_Kiro
 # Cambiar a rama de desarrollo
 git checkout dev
 
+# Setup automático (Linux/Mac)
+chmod +x scripts/setup.sh
+./scripts/setup.sh
+
+# Setup automático (Windows)
+scripts\setup.bat
+```
+
+**Setup manual:**
+
+```bash
+# 1. Copiar variables de entorno
+cp .env.example .env.local
+
+# 2. Editar .env.local con tus credenciales de Supabase
+# NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima
+
+# 3. Iniciar desarrollo con Docker
+make dev
+# O alternativamente:
+docker-compose up --build
+```
+
+**Comandos Docker disponibles:**
+
+```bash
+make dev              # Iniciar desarrollo
+make test             # Ejecutar tests
+make logs             # Ver logs de la aplicación
+make shell            # Acceder al contenedor
+make supabase         # Iniciar Supabase local (opcional)
+make clean            # Limpiar contenedores e imágenes
+make help             # Ver todos los comandos
+```
+
+### 💻 Desarrollo Local (Sin Docker)
+
+```bash
 # Instalar dependencias
 npm install
 
 # Configurar variables de entorno
 cp .env.example .env.local
-# Editar .env.local con tus credenciales de Supabase
+# Editar .env.local con tus credenciales
 
 # Ejecutar en modo desarrollo
 npm run dev
 ```
 
-### Desarrollo con Docker
-
-```bash
-# Ejecutar con Docker Compose
-npm run docker:dev
-
-# Detener contenedores
-npm run docker:down
-```
-
 ### Scripts Disponibles
 
 ```bash
-npm run dev          # Servidor de desarrollo
-npm run build        # Build de producción
-npm run start        # Servidor de producción
-npm run lint         # Linter ESLint
-npm run test         # Tests unitarios
-npm run test:watch   # Tests en modo watch
-npm run test:property # Tests basados en propiedades
+# Desarrollo
+make dev             # Servidor de desarrollo (Docker)
+npm run dev          # Servidor de desarrollo (local)
+make test            # Tests (Docker)
+npm run test         # Tests (local)
+
+# Utilidades
+make lint            # Linter
+make format          # Formatear código
+make clean           # Limpiar Docker
+make setup           # Setup inicial
+
+# Base de datos
+make supabase        # Supabase local
+make supabase-stop   # Detener Supabase
+
+# Producción
+make build           # Build de producción
+make prod            # Ejecutar producción
 ```
 
-## 🎨 Sistema de Diseño
+## 🐳 ¿Por qué Docker?
+
+### Ventajas para el Equipo
+
+- **✅ Consistencia**: Mismo entorno en todos los equipos
+- **✅ Sin problemas de dependencias**: No más "funciona en mi máquina"
+- **✅ Setup rápido**: Nuevos desarrolladores productivos en minutos
+- **✅ Aislamiento**: No interfiere con otras versiones de Node.js
+- **✅ Fácil limpieza**: `make clean` elimina todo sin rastros
+
+### Comparación
+
+| Aspecto | Docker | Local |
+|---------|--------|-------|
+| Setup inicial | 5 minutos | 15-30 minutos |
+| Problemas de versiones | ❌ Ninguno | ⚠️ Frecuentes |
+| Consistencia del equipo | ✅ 100% | ⚠️ Variable |
+| Limpieza del sistema | ✅ Completa | ⚠️ Parcial |
+| Requisitos | Solo Docker | Node.js + dependencias |
+
+## 🚀 Despliegue
+
+### Con Docker (Recomendado)
+
+```bash
+# Build imagen de producción
+docker-compose -f docker-compose.prod.yml build
+
+# Ejecutar en producción
+docker-compose -f docker-compose.prod.yml up -d
+```
 
 ### Colores
 
@@ -173,6 +246,65 @@ Utilizamos **fast-check** para generar casos de prueba aleatorios y verificar pr
 - Validación de formatos costarricenses
 - Aislamiento multi-tenant
 - Máquina de estados de órdenes
+
+### Cobertura de Tests
+
+```bash
+npm run test -- --coverage
+```
+
+Objetivo: > 80% de cobertura en código crítico
+
+## 🔄 CI/CD Pipeline
+
+El proyecto utiliza **GitHub Actions** para automatizar testing y despliegue:
+
+### Flujo Automático
+
+1. **Push a rama `dev`** → Ejecuta tests automáticamente
+2. **Tests pasan** → Construye imagen Docker
+3. **Tests fallan** → Pipeline se detiene, notifica al desarrollador
+4. **Imagen construida** → Se sube a GitHub Container Registry
+
+### Verificar Estado
+
+- **GitHub Actions**: https://github.com/Huevaldinho/TallerCR_Kiro/actions
+- **Container Registry**: https://github.com/Huevaldinho/TallerCR_Kiro/pkgs/container/TallerCR_Kiro
+
+### Health Check Endpoint
+
+Verifica que la aplicación está funcionando correctamente:
+
+```bash
+# Full health check
+curl http://localhost:3000/api/health | jq
+
+# Respuesta (200 OK):
+{
+  "status": "healthy",
+  "timestamp": "2024-12-21T10:30:00Z",
+  "version": "0.1.0",
+  "environment": "development",
+  "uptime": 3600,
+  "checks": {
+    "api": "ok",
+    "database": "pending",
+    "cache": "pending"
+  }
+}
+
+# Liveness probe (para Kubernetes)
+curl -I http://localhost:3000/api/health
+```
+
+### Documentación Completa
+
+Ver **[CI_CD_GUIDE.md](./CI_CD_GUIDE.md)** para:
+- Detalles del pipeline
+- Troubleshooting
+- Best practices
+- Monitoreo
+- Despliegue
 
 ## 📱 PWA
 
