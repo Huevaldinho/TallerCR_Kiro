@@ -4,17 +4,19 @@
 
 This implementation plan follows a milestone-based approach, building the system incrementally from core infrastructure to complete invoice generation. Each milestone delivers working, testable functionality that builds upon previous milestones.
 
-## Milestones
+## Progress Summary
 
-1. **Core Infrastructure & Utilities** - Project setup, monetary precision, validation utilities
-2. **Authentication & Taller Management** - User registration, login, fiscal configuration
-3. **Vehicle & Client Management** - Search, registration, validation with CR formats
-4. **Service Order Creation** - Order workflow, state management
-5. **Quotation Engine** - CABYS catalog, fiscal calculations, line items
-6. **Magic Links & Client Portal** - Token generation, public approval flow
-7. **Invoice Generation** - ATV v4.3 JSON generator, clave numérica
-8. **Dashboard & Search** - Order management, filtering, search
-9. **Testing & Polish** - Comprehensive testing, PWA, performance
+| Milestone | Status | Progress |
+|-----------|--------|----------|
+| 1. Core Infrastructure & Utilities | 🟡 In Progress | 70% |
+| 2. Authentication & Taller Management | 🟡 In Progress | 30% |
+| 3. Vehicle & Client Management | ⚪ Not Started | 0% |
+| 4. Service Order Creation | ⚪ Not Started | 0% |
+| 5. Quotation Engine | ⚪ Not Started | 0% |
+| 6. Magic Links & Client Portal | ⚪ Not Started | 0% |
+| 7. Invoice Generation | ⚪ Not Started | 0% |
+| 8. Dashboard & Search | ⚪ Not Started | 0% |
+| 9. Testing & Polish | ⚪ Not Started | 0% |
 
 ---
 
@@ -22,75 +24,74 @@ This implementation plan follows a milestone-based approach, building the system
 
 ### 1.1 Project Setup and Configuration
 
-- [ ] 1.1.1 Initialize Next.js 14 project with TypeScript and App Router
-  - Create project with `npx create-next-app@latest`
-  - Configure TypeScript strict mode
-  - Set up src/ directory structure
+- [x] 1.1.1 Initialize Next.js 14 project with TypeScript and App Router
+  - ✅ Created project with Next.js 14
+  - ✅ Configured TypeScript strict mode
+  - ✅ Set up src/ directory structure
   - _Requirements: Foundation for all development_
 
-- [ ] 1.1.2 Install and configure Tailwind CSS with design system
-  - Install Tailwind CSS, PostCSS, Autoprefixer
-  - Configure tailwind.config.js with custom colors (#3B82F6, #10B981)
-  - Set up Inter font family
-  - Create globals.css with base styles
+- [x] 1.1.2 Install and configure Tailwind CSS with design system
+  - ✅ Installed Tailwind CSS, PostCSS, Autoprefixer
+  - ✅ Configured tailwind.config.ts with custom colors (#3B82F6, #10B981)
+  - ✅ Set up Inter font family
+  - ✅ Created globals.css with base styles
   - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5_
 
-- [ ] 1.1.3 Install core dependencies
-  - Install: big.js, react-hook-form, zod, react-input-mask, uuid, date-fns
-  - Install dev dependencies: jest, @testing-library/react, fast-check
-  - Configure package.json scripts
+- [x] 1.1.3 Install core dependencies
+  - ✅ Installed: big.js, react-hook-form, zod, uuid, date-fns
+  - ✅ Installed dev dependencies: jest, @testing-library/react, fast-check
+  - ✅ Configured package.json scripts
   - _Requirements: Foundation for monetary precision and validation_
 
-
-- [ ] 1.1.4 Set up Docker development environment
-  - Create Dockerfile for Next.js development
-  - Create docker-compose.yml with Next.js service
-  - Configure hot reload and volume mounting
-  - Add .dockerignore file
-  - Document Docker commands in README
+- [x] 1.1.4 Set up Docker development environment
+  - ✅ Created Dockerfile for Next.js development
+  - ✅ Created docker-compose.yml with Next.js and PostgreSQL services
+  - ✅ Configured hot reload and volume mounting
+  - ✅ Added .dockerignore file
+  - ✅ Documented Docker commands in README
   - _Requirements: Development environment consistency_
 
 ### 1.2 Monetary Precision Utilities
 
-- [ ] 1.2.1 Create fiscal calculation service with big.js
-  - Implement lib/fiscal/calculator.ts
-  - Functions: calculateSubtotal, calculateIVA, calculateTotal
-  - Use big.js for all arithmetic operations
-  - Store values as integer centimos
+- [x] 1.2.1 Create fiscal calculation service with big.js
+  - ✅ Implemented src/lib/fiscal/calculator.ts
+  - ✅ Functions: calculateSubtotal, calculateIVA, calculateTotal, calculateInvoiceTotals
+  - ✅ Uses big.js for all arithmetic operations
+  - ✅ Stores values as integer centimos
   - _Requirements: 7.1, 7.2, 7.3, 7.5_
 
-- [ ] 1.2.2 Write property tests for fiscal calculations
-  - **Property 12: Fiscal Calculation Correctness with Precision**
-  - **Property 12a: Monetary Storage Precision**
-  - Test with random line items (1-20 services)
-  - Verify IVA always exactly 13%
-  - Verify no floating-point errors
-  - Test edge cases: ₡0.01, ₡999,999.99
+- [x] 1.2.2 Write property tests for fiscal calculations
+  - ✅ **Property 12: Fiscal Calculation Correctness with Precision**
+  - ✅ **Property 12a: Monetary Storage Precision**
+  - ✅ Tested with random line items (1-20 services)
+  - ✅ Verified IVA always exactly 13%
+  - ✅ Verified no floating-point errors
+  - ✅ Tested edge cases: ₡0.01, ₡999,999.99
   - _Requirements: 7.1, 7.2, 7.3, 7.5_
 
-- [ ] 1.2.3 Create currency formatting utilities
-  - Implement toCentimos, fromCentimos, formatCRC functions
-  - Handle display conversion and locale formatting
+- [x] 1.2.3 Create currency formatting utilities
+  - ✅ Implemented src/lib/fiscal/currency.ts
+  - ✅ Functions: toCentimos, fromCentimos, formatCRC, parseCRC
+  - ✅ Handle display conversion and locale formatting
   - _Requirements: 7.5, 7.6_
-
 
 ### 1.3 Validation Utilities
 
-- [ ] 1.3.1 Create Costa Rican format validators
-  - Implement lib/validation/cr-formats.ts
-  - Validators for: cédula física, jurídica, DIMEX, NITE, pasaporte
-  - Phone number validator (+506 format)
-  - Plate format validators (ABC-123, TX-1234, A-12345)
-  - CABYS code validator (13 digits)
+- [x] 1.3.1 Create Costa Rican format validators
+  - ✅ Implemented src/lib/validation/cr-formats.ts
+  - ✅ Validators for: cédula física, jurídica, DIMEX, NITE, pasaporte
+  - ✅ Phone number validator (+506 format)
+  - ✅ Plate format validators (ABC-123, TX-1234, A-12345)
+  - ✅ CABYS code validator (13 digits)
   - _Requirements: 1.2, 1.3, 3.8, 4.4, 4.5, 4.6, 4.7, 6.3_
 
-- [ ] 1.3.2 Write property tests for format validators
-  - **Property 2: Cédula Jurídica Format Validation**
-  - **Property 3: Phone Number Format Validation**
-  - **Property 6: Multi-Format Plate Acceptance**
-  - **Property 8: Identification Number Validation by Type**
-  - **Property 11: CABYS Code Validation**
-  - Generate random valid/invalid formats
+- [x] 1.3.2 Write property tests for format validators
+  - ✅ **Property 2: Cédula Jurídica Format Validation**
+  - ✅ **Property 3: Phone Number Format Validation**
+  - ✅ **Property 6: Multi-Format Plate Acceptance**
+  - ✅ **Property 8: Identification Number Validation by Type**
+  - ✅ **Property 11: CABYS Code Validation**
+  - ✅ Generated random valid/invalid formats
   - _Requirements: 1.2, 1.3, 3.8, 4.4-4.7, 6.3_
 
 - [ ] 1.3.3 Create input mask configurations
@@ -100,10 +101,10 @@ This implementation plan follows a milestone-based approach, building the system
 
 ### 1.4 Database Setup with Prisma
 
-- [ ] 1.4.1 Set up PostgreSQL in Docker
-  - Add PostgreSQL service to docker-compose.yml
-  - Configure environment variables for database connection
-  - Create database initialization script
+- [x] 1.4.1 Set up PostgreSQL in Docker
+  - ✅ Added PostgreSQL service to docker-compose.yml
+  - ✅ Configured environment variables for database connection
+  - ✅ Database taller_cr created and running
   - _Requirements: 19.1_
 
 - [ ] 1.4.2 Install and configure Prisma
@@ -113,7 +114,7 @@ This implementation plan follows a milestone-based approach, building the system
   - _Requirements: 19.3_
 
 - [ ] 1.4.3 Create Prisma schema with all models
-  - Define models: Taller, Vehicle, Client, ServiceOrder, ServiceLineItem, OrderToken, ServicesCatalog, OrderStatusHistory
+  - Define models: Taller, User, Vehicle, Client, ServiceOrder, ServiceLineItem, OrderToken, ServicesCatalog, OrderStatusHistory
   - All monetary fields as Int (centimos)
   - Add indexes on: placa, orderNumber, clientPhone, tallerId
   - _Requirements: 19.1, 19.10_
@@ -121,7 +122,7 @@ This implementation plan follows a milestone-based approach, building the system
 - [ ] 1.4.4 Generate Prisma client and run migrations
   - Run `npx prisma migrate dev --name init`
   - Generate Prisma client
-  - Create lib/prisma/client.ts with singleton pattern
+  - Create src/lib/prisma/client.ts with singleton pattern
   - _Requirements: 19.3_
 
 - [ ] 1.4.5 Implement multi-tenant isolation middleware
@@ -146,7 +147,6 @@ This implementation plan follows a milestone-based approach, building the system
 ---
 
 ## Milestone 2: Authentication & Taller Management
-
 
 ### 2.1 Authentication Setup with NextAuth.js
 
@@ -191,7 +191,6 @@ This implementation plan follows a milestone-based approach, building the system
   - Send confirmation email
   - _Requirements: 1.1, 1.4, 1.5_
 
-
 - [ ] 2.2.4 Create registration page UI
   - Implement app/(auth)/registro/page.tsx
   - Mobile-first responsive design
@@ -225,7 +224,6 @@ This implementation plan follows a milestone-based approach, building the system
   - Visual confirmation on save
   - _Requirements: 2.1, 2.4, 2.5_
 
-
 - [ ] 2.4.3 Write property tests for fiscal validation
   - **Property 13: Invoice Generation Prerequisites**
   - Test incomplete fiscal data scenarios
@@ -233,10 +231,11 @@ This implementation plan follows a milestone-based approach, building the system
 
 ### 2.5 Dashboard Layout
 
-- [ ] 2.5.1 Create dashboard layout component
-  - Implement app/(dashboard)/layout.tsx
-  - Header with logo, search bar, user menu
-  - Mobile-first navigation
+- [x] 2.5.1 Create dashboard layout component
+  - ✅ Implemented src/app/dashboard/layout.tsx
+  - ✅ Header with logo, search bar, user menu (DashboardHeader.tsx)
+  - ✅ Sidebar with navigation (DashboardSidebar.tsx)
+  - ✅ Mobile-first navigation
   - _Requirements: 16.1, 16.2, 16.3_
 
 - [ ] 2.5.2 Create reusable UI components
@@ -257,7 +256,6 @@ This implementation plan follows a milestone-based approach, building the system
   - Display results with vehicle details
   - _Requirements: 3.1, 3.2_
 
-
 - [ ] 3.1.2 Write property tests for vehicle search
   - **Property 5: Vehicle Search Case and Hyphen Insensitivity**
   - Test search with different cases and hyphen variations
@@ -270,7 +268,7 @@ This implementation plan follows a milestone-based approach, building the system
   - _Requirements: 3.5, 3.6, 3.7, 3.8_
 
 - [ ] 3.1.4 Create vehicle search page
-  - Implement app/(dashboard)/vehiculos/page.tsx
+  - Implement app/dashboard/vehiculos/page.tsx
   - Search bar with results
   - "Registrar nuevo" option when not found
   - _Requirements: 3.1, 3.3, 3.4, 3.5_
@@ -288,3 +286,254 @@ This implementation plan follows a milestone-based approach, building the system
   - Test missing required fields
   - _Requirements: 4.2_
 
+---
+
+## Milestone 4: Service Order Creation
+
+### 4.1 Order Creation Flow
+
+- [ ] 4.1.1 Create order creation wizard component
+  - Step 1: Select vehicle
+  - Step 2: Select/create client
+  - Step 3: Add motivo de ingreso
+  - _Requirements: 5.1, 5.5_
+
+- [ ] 4.1.2 Implement order number generation
+  - Format: ORD-YYYY-### (e.g., ORD-2024-001)
+  - Auto-increment per taller per year
+  - _Requirements: 5.2_
+
+- [ ] 4.1.3 Write property tests for order creation
+  - **Property 9: Order Number Format Generation**
+  - **Property 10: Initial Order Status**
+  - _Requirements: 5.2, 5.4_
+
+- [ ] 4.1.4 Create order detail page
+  - Display order info, vehicle, client, services
+  - Status badge with color
+  - Action buttons based on status
+  - _Requirements: 11.10, 12.6_
+
+### 4.2 Order State Management
+
+- [ ] 4.2.1 Implement order state machine
+  - States: BORRADOR, ENVIADA, APROBADA, FACTURADA, COMPLETADA
+  - Valid transitions only
+  - _Requirements: 11.1-11.9_
+
+- [ ] 4.2.2 Write property tests for state transitions
+  - **Property 22: Order State Machine Transitions**
+  - **Property 23: Facturada Order Edit Prevention**
+  - _Requirements: 11.3-11.8_
+
+---
+
+## Milestone 5: Quotation Engine
+
+### 5.1 Service Line Items
+
+- [ ] 5.1.1 Create service line item component
+  - Fields: descripción, código CABYS, cantidad, precio unitario
+  - Real-time subtotal calculation
+  - _Requirements: 6.4, 6.5_
+
+- [ ] 5.1.2 Create CABYS service search
+  - Autocomplete from catalog
+  - Show description, code, suggested price
+  - _Requirements: 6.1, 6.2, 6.8_
+
+- [ ] 5.1.3 Implement quotation totals display
+  - Subtotal, IVA (13%), Total
+  - Real-time updates
+  - _Requirements: 7.1-7.8_
+
+### 5.2 Service Catalog
+
+- [ ] 5.2.1 Create service catalog management
+  - Add custom services
+  - Mark as favorite
+  - _Requirements: 6.5, 6.6, 6.7_
+
+---
+
+## Milestone 6: Magic Links & Client Portal
+
+### 6.1 Magic Link Generation
+
+- [ ] 6.1.1 Implement token generation
+  - UUID v4 tokens
+  - 72-hour expiry
+  - _Requirements: 9.2, 9.3, 9.4_
+
+- [ ] 6.1.2 Write property tests for magic links
+  - **Property 16: Magic Link Generation Prerequisites**
+  - **Property 17: Magic Link Token Uniqueness and Format**
+  - **Property 18: Magic Link Expiry Calculation**
+  - _Requirements: 9.1-9.4_
+
+- [ ] 6.1.3 Create WhatsApp share functionality
+  - Deep link with pre-formatted message
+  - _Requirements: 9.6, 9.7_
+
+### 6.2 Public Client Portal
+
+- [ ] 6.2.1 Create public order view page
+  - app/orden/[id]/page.tsx
+  - No auth required
+  - Mobile-optimized
+  - _Requirements: 10.1-10.3_
+
+- [ ] 6.2.2 Implement approval flow
+  - Confirmation dialog
+  - Status update
+  - Success message
+  - _Requirements: 10.4-10.11_
+
+- [ ] 6.2.3 Write property tests for approval
+  - **Property 19: Token Validation Rules**
+  - **Property 20: Order Approval State Transition**
+  - **Property 21: Single-Use Token Enforcement**
+  - _Requirements: 9.8-9.10, 10.6-10.8_
+
+---
+
+## Milestone 7: Invoice Generation
+
+### 7.1 ATV v4.3 Invoice Generator
+
+- [ ] 7.1.1 Create invoice JSON generator
+  - ATV v4.3 structure
+  - All required fields
+  - _Requirements: 8.4-8.10_
+
+- [ ] 7.1.2 Implement clave numérica generation
+  - 50-digit unique identifier
+  - Hacienda format
+  - _Requirements: 8.6_
+
+- [ ] 7.1.3 Write property tests for invoice
+  - **Property 14: Clave Numérica Format and Uniqueness**
+  - **Property 15: Invoice JSON Structure Completeness**
+  - _Requirements: 8.5, 8.6_
+
+- [ ] 7.1.4 Create invoice download/copy functionality
+  - Download JSON file
+  - Copy to clipboard
+  - _Requirements: 8.13_
+
+---
+
+## Milestone 8: Dashboard & Search
+
+### 8.1 Order Dashboard
+
+- [ ] 8.1.1 Create order list component
+  - Order cards with details
+  - Status badges
+  - Time elapsed
+  - _Requirements: 12.2, 12.3_
+
+- [ ] 8.1.2 Implement filters
+  - Todas, Enviadas, Aprobadas, Facturadas
+  - _Requirements: 12.4, 12.5_
+
+- [ ] 8.1.3 Write property tests for filtering
+  - **Property 24: Order Filtering Correctness**
+  - _Requirements: 12.4_
+
+- [ ] 8.1.4 Implement pagination
+  - 20 orders per page
+  - _Requirements: 12.9_
+
+### 8.2 Search Functionality
+
+- [ ] 8.2.1 Create global search
+  - Search by order number, placa, client name, phone
+  - Real-time results
+  - _Requirements: 13.1-13.6_
+
+- [ ] 8.2.2 Write property tests for search
+  - **Property 25: Multi-Field Search Coverage**
+  - _Requirements: 13.2_
+
+### 8.3 Order Actions
+
+- [ ] 8.3.1 Implement order duplication
+  - Copy vehicle, client, services
+  - New order number
+  - _Requirements: 14.1-14.4_
+
+- [ ] 8.3.2 Write property tests for duplication
+  - **Property 26: Order Duplication Correctness**
+  - _Requirements: 14.2_
+
+---
+
+## Milestone 9: Testing & Polish
+
+### 9.1 Comprehensive Testing
+
+- [ ] 9.1.1 Run all property tests
+  - Verify all 28 properties pass
+  - _Requirements: All_
+
+- [ ] 9.1.2 Integration tests
+  - Complete user flows
+  - _Requirements: All_
+
+### 9.2 PWA Configuration
+
+- [ ] 9.2.1 Create web app manifest
+  - App name, icons, theme color
+  - _Requirements: 18.1_
+
+- [ ] 9.2.2 Implement service worker
+  - Offline caching
+  - _Requirements: 18.2-18.7_
+
+### 9.3 Performance Optimization
+
+- [ ] 9.3.1 Optimize queries
+  - < 200ms response time
+  - _Requirements: 20.1_
+
+- [ ] 9.3.2 Implement lazy loading
+  - Images, non-critical components
+  - _Requirements: 20.6_
+
+---
+
+## Requirements Traceability Matrix
+
+| Requirement | Tasks | Status |
+|-------------|-------|--------|
+| 1.1-1.7 (Taller Registration) | 2.2.1-2.2.4 | ⚪ Not Started |
+| 2.1-2.5 (Fiscal Configuration) | 2.4.1-2.4.3 | ⚪ Not Started |
+| 3.1-3.8 (Vehicle Registration) | 3.1.1-3.1.4 | ⚪ Not Started |
+| 4.1-4.11 (Client Registration) | 3.2.1-3.2.2 | ⚪ Not Started |
+| 5.1-5.6 (Service Order Creation) | 4.1.1-4.1.4 | ⚪ Not Started |
+| 6.1-6.8 (CABYS Quotation) | 5.1.1-5.2.1 | ⚪ Not Started |
+| 7.1-7.8 (Fiscal Calculation) | 1.2.1-1.2.3 | ✅ Complete |
+| 8.1-8.14 (Invoice Generation) | 7.1.1-7.1.4 | ⚪ Not Started |
+| 9.1-9.12 (Magic Links) | 6.1.1-6.1.3 | ⚪ Not Started |
+| 10.1-10.11 (Client Portal) | 6.2.1-6.2.3 | ⚪ Not Started |
+| 11.1-11.10 (Order State) | 4.2.1-4.2.2 | ⚪ Not Started |
+| 12.1-12.9 (Order Dashboard) | 8.1.1-8.1.4 | ⚪ Not Started |
+| 13.1-13.6 (Order Search) | 8.2.1-8.2.2 | ⚪ Not Started |
+| 14.1-14.4 (Order Duplication) | 8.3.1-8.3.2 | ⚪ Not Started |
+| 15.1-15.5 (Vehicle History) | 3.1.4 | ⚪ Not Started |
+| 16.1-16.7 (Mobile-First Design) | 2.5.1-2.5.2 | 🟡 Partial |
+| 17.1-17.7 (Design System) | 1.1.2 | ✅ Complete |
+| 18.1-18.7 (PWA) | 9.2.1-9.2.2 | ⚪ Not Started |
+| 19.1-19.10 (Database & Auth) | 1.4.1-1.4.7, 2.1.1-2.1.3 | 🟡 Partial |
+| 20.1-20.8 (Performance) | 9.3.1-9.3.2 | ⚪ Not Started |
+
+---
+
+## Notes
+
+- Tasks marked with [x] are completed
+- Tasks marked with [ ] are pending
+- Each task references specific requirements for traceability
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases
