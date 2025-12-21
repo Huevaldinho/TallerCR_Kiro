@@ -1,5 +1,8 @@
 # Taller Pro CR
 
+[![CI/CD Pipeline](https://github.com/Huevaldinho/TallerCR_Kiro/actions/workflows/ci-cd.yml/badge.svg?branch=dev)](https://github.com/Huevaldinho/TallerCR_Kiro/actions/workflows/ci-cd.yml)
+[![codecov](https://codecov.io/gh/Huevaldinho/TallerCR_Kiro/branch/dev/graph/badge.svg)](https://codecov.io/gh/Huevaldinho/TallerCR_Kiro)
+
 Sistema de gestión para talleres mecánicos en Costa Rica con cumplimiento fiscal automático (IVA + CABYS) y generación de facturas electrónicas ATV v4.3.
 
 ## 🚀 Características Principales
@@ -265,6 +268,16 @@ El proyecto utiliza **GitHub Actions** para automatizar testing y despliegue:
 2. **Tests pasan** → Construye imagen Docker
 3. **Tests fallan** → Pipeline se detiene, notifica al desarrollador
 4. **Imagen construida** → Se sube a GitHub Container Registry
+
+### Branch Protection
+
+La rama `dev` está protegida y requiere:
+- ✅ Todos los tests pasen
+- ✅ Docker image se construya exitosamente
+- ✅ Aprobación de código (code review)
+- ✅ Rama actualizada con main
+
+**Ver:** [.github/BRANCH_PROTECTION.md](.github/BRANCH_PROTECTION.md) para configuración detallada
 
 ### Verificar Estado
 
