@@ -45,6 +45,9 @@ COPY . .
 # Ensure public directory exists (Next.js requires it)
 RUN mkdir -p public
 
+# Generate Prisma Client before build
+RUN npx prisma generate
+
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
