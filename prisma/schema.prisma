@@ -1,0 +1,258 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTHENTICATION & TALLER MANAGEMENT
+// ============================================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  tallerId      String    @unique
+  taller        Taller    @relation(fields: [tallerId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([email])
+}
+
+model Taller {
+  id                  String    @id @default(uuid())
+  nombre              String
+  cedulaJuridica      String    @unique
+  nombreResponsable   String
+  telefono            String
+  email               String    @unique
+  
+  // Fiscal Configuration (optional initially)
+  nombreComercial     String?
+  actividadEconomica  String?
+  provincia           String?
+  canton              String?
+  distrito            String?
+  barrio              String?
+  otrasSenas          String?
+  
+  // Relations
+  user                User?
+  vehicles            Vehicle[]
+  clients             Client[]
+  serviceOrders       ServiceOrder[]
+  servicesCatalog     ServicesCatalog[]
+  
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([cedulaJuridica])
+  @@index([email])
+}
+
+// ============================================
+// VEHICLE MANAGEMENT
+// ============================================
+
+model Vehicle {
+  id          String    @id @default(uuid())
+  tallerId    String
+  taller      Taller    @relation(fields: [tallerId], references: [id], onDelete: Cascade)
+  
+  placa       String
+  marca       String
+  modelo      String
+  año         Int
+  color       String?
+  kilometraje Int?
+  vin         String?   @db.VarChar(17)
+  
+  // Relations
+  serviceOrders ServiceOrder[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([tallerId, placa])
+  @@index([placa])
+  @@index([tallerId])
+}
+
+// ============================================
+// CLIENT MANAGEMENT
+// ============================================
+
+enum TipoIdentificacion {
+  FISICA
+  JURIDICA
+  DIMEX
+  NITE
+  PASAPORTE
+}
+
+model Client {
+  id                    String              @id @default(uuid())
+  tallerId              String
+  taller                Taller              @relation(fields: [tallerId], references: [id], onDelete: Cascade)
+  
+  nombreCompleto        String
+  tipoIdentificacion    TipoIdentificacion
+  numeroIdentificacion  String
+  telefono              String
+  email                 String?
+  direccion             String?
+  
+  // Relations
+  serviceOrders         ServiceOrder[]
+  
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@unique([tallerId, numeroIdentificacion])
+  @@index([tallerId])
+  @@index([telefono])
+  @@index([numeroIdentificacion])
+}
+
+// ============================================
+// SERVICE ORDER MANAGEMENT
+// ============================================
+
+enum OrderStatus {
+  BORRADOR
+  ENVIADA
+  APROBADA
+  FACTURADA
+  COMPLETADA
+}
+
+model ServiceOrder {
+  id              String        @id @default(uuid())
+  tallerId        String
+  taller          Taller        @relation(fields: [tallerId], references: [id], onDelete: Cascade)
+  vehicleId       String
+  vehicle         Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  clientId        String
+  client          Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  orderNumber     String        @unique
+  status          OrderStatus   @default(BORRADOR)
+  motivoIngreso   String?
+  fechaRecepcion  DateTime      @default(now())
+  
+  // Monetary values stored as integers (centimos)
+  subtotalCentimos  Int?
+  ivaCentimos       Int?
+  totalCentimos     Int?
+  
+  // Invoice data
+  invoiceJson       Json?
+  claveNumerica     String?       @db.VarChar(50)
+  
+  // Relations
+  lineItems         ServiceLineItem[]
+  tokens            OrderToken[]
+  statusHistory     OrderStatusHistory[]
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([tallerId])
+  @@index([vehicleId])
+  @@index([clientId])
+  @@index([orderNumber])
+  @@index([status])
+}
+
+model ServiceLineItem {
+  id                      String        @id @default(uuid())
+  orderId                 String
+  order                   ServiceOrder  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  numeroLinea             Int
+  descripcion             String
+  cabysCode               String        @db.VarChar(13)
+  cantidad                Int           @default(1)
+  
+  // Monetary values stored as integers (centimos)
+  precioUnitarioCentimos  Int
+  subtotalCentimos        Int
+  ivaCentimos             Int
+  totalLineaCentimos      Int
+  
+  createdAt               DateTime      @default(now())
+
+  @@unique([orderId, numeroLinea])
+  @@index([orderId])
+}
+
+// ============================================
+// MAGIC LINKS
+// ============================================
+
+model OrderToken {
+  id          String        @id @default(uuid())
+  orderId     String
+  order       ServiceOrder  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  token       String        @unique
+  expiresAt   DateTime
+  used        Boolean       @default(false)
+  usedAt      DateTime?
+  invalidated Boolean       @default(false)
+  
+  createdAt   DateTime      @default(now())
+
+  @@index([orderId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+// ============================================
+// SERVICE CATALOG
+// ============================================
+
+model ServicesCatalog {
+  id                      String    @id @default(uuid())
+  tallerId                String?
+  taller                  Taller?   @relation(fields: [tallerId], references: [id], onDelete: Cascade)
+  
+  descripcion             String
+  cabysCode               String    @db.VarChar(13)
+  precioSugeridoCentimos  Int?
+  isFavorite              Boolean   @default(false)
+  isGlobal                Boolean   @default(false)
+  
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([tallerId])
+  @@index([cabysCode])
+  @@index([isGlobal])
+}
+
+// ============================================
+// ORDER STATUS HISTORY
+// ============================================
+
+model OrderStatusHistory {
+  id          String        @id @default(uuid())
+  orderId     String
+  order       ServiceOrder  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  fromStatus  OrderStatus?
+  toStatus    OrderStatus
+  changedBy   String?
+  notes       String?
+  
+  changedAt   DateTime      @default(now())
+
+  @@index([orderId])
+}
