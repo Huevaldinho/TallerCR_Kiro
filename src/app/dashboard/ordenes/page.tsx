@@ -33,7 +33,10 @@ export default function OrdenesPage() {
         setOrders(data.orders || [])
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch((err) => {
+        console.error('Error fetching orders:', err)
+        setLoading(false)
+      })
   }, [])
 
   const filteredOrders = filter === 'all' ? orders : orders.filter(o => o.status === filter)

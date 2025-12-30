@@ -30,7 +30,10 @@ export default function DashboardPage() {
         setRecentOrders(data.recentOrders || [])
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch((err) => {
+        console.error('Error fetching dashboard stats:', err)
+        setLoading(false)
+      })
   }, [])
 
   if (loading) {

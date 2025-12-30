@@ -2,50 +2,79 @@
 
 Sistema de gestión para talleres mecánicos en Costa Rica con cumplimiento fiscal automático (IVA + CABYS).
 
+- FELIPE DE JESUS OBANDO ARRIETA
+- LUIS ALEJANDRO CASTRO RODRIGUEZ
+- DIANA MURILLO CERDAS
+- LUIS ORLANDO HERNANDEZ ULATE
+
+ 
+
 ## 📋 Estado del Proyecto
 
 **Versión:** MVP en desarrollo  
-**Última actualización:** Diciembre 2024
+**Última actualización:** Diciembre 21, 2024
 
 ### ✅ Funcionalidades Implementadas
 
+- **Infraestructura y DevOps**
+  - ✅ Docker Compose para desarrollo local
+  - ✅ Base de datos PostgreSQL con persistencia de datos
+  - ✅ Seed automático en primer inicio
+  - ✅ CI/CD con GitHub Actions
+  - ✅ Health check endpoint
+  - ✅ Logging de errores en frontend
+
 - **Gestión de Clientes**
-  - Registro con tipos de identificación CR (Física, Jurídica, DIMEX, NITE, Pasaporte)
-  - Listado, búsqueda, detalles y edición
-  - Historial de órdenes por cliente
-  - Estadísticas (total órdenes, total facturado)
+  - ✅ Registro con tipos de identificación CR (Física, Jurídica, DIMEX, NITE, Pasaporte)
+  - ✅ Listado, búsqueda, detalles y edición
+  - ✅ Historial de órdenes por cliente
+  - ✅ Estadísticas (total órdenes, total facturado)
+  - ✅ Validación de formatos CR
 
 - **Gestión de Vehículos**
-  - Registro con placas CR (Particular, Taxi, Moto)
-  - Listado, búsqueda, detalles y edición
-  - Historial de órdenes por vehículo
-  - Estadísticas (total órdenes, total facturado)
+  - ✅ Registro con placas CR (Particular, Taxi, Moto)
+  - ✅ Listado, búsqueda por placa, detalles y edición
+  - ✅ Historial de órdenes por vehículo
+  - ✅ Estadísticas (total órdenes, total facturado)
+  - ✅ Validación de formatos de placas
 
 - **Gestión de Órdenes de Servicio**
-  - Creación de órdenes con múltiples servicios
-  - Cálculo automático de IVA (13%)
-  - Códigos CABYS para servicios
-  - Estados: BORRADOR → ENVIADA → APROBADA → FACTURADA → COMPLETADA
-  - Historial de cambios de estado
-  - Soporte para imágenes (modelo creado, pendiente upload)
+  - ✅ Creación de órdenes con múltiples servicios
+  - ✅ Cálculo automático de IVA (13%) con precisión monetaria
+  - ✅ Códigos CABYS para servicios (catálogo de 25 servicios)
+  - ✅ Estados: BORRADOR → ENVIADA → APROBADA → FACTURADA → COMPLETADA
+  - ✅ Historial de cambios de estado
+  - ✅ Tokens para aprobación de clientes
+  - ⚠️ Soporte para imágenes (modelo creado, pendiente upload)
 
 - **API REST Completa**
-  - Endpoints CRUD para clientes, vehículos y órdenes
-  - Documentación Swagger en `/api-docs`
-  - Validaciones y manejo de errores
+  - ✅ Endpoints CRUD para clientes, vehículos y órdenes
+  - ✅ Documentación Swagger en `/api-docs`
+  - ✅ Validaciones con Zod
+  - ✅ Manejo de errores consistente
+  - ✅ Respuestas tipadas con TypeScript
 
 - **Dashboard**
-  - Estadísticas generales
-  - Navegación entre entidades
-  - Links clickeables entre órdenes, clientes y vehículos
+  - ✅ Estadísticas generales (órdenes activas, ingresos, totales)
+  - ✅ Navegación entre entidades
+  - ✅ Links clickeables entre órdenes, clientes y vehículos
+  - ✅ Filtros por estado de orden
+  - ✅ Búsqueda de vehículos por placa
+
+- **Testing**
+  - ✅ 75+ tests unitarios con Jest
+  - ✅ Property-based testing con fast-check
+  - ✅ Tests de validación de formatos CR
+  - ✅ Tests de cálculos fiscales
 
 ### 🚧 Pendiente de Implementar
 
 - Upload de imágenes para órdenes
 - Facturación electrónica (integración con Hacienda)
-- Magic Links para aprobación de clientes
-- Autenticación y multi-tenant
+- Magic Links para aprobación de clientes (modelo listo)
+- Autenticación y multi-tenant (modelo User creado)
 - PWA y modo offline
+- Notificaciones por email/SMS
 
 ---
 
@@ -54,7 +83,7 @@ Sistema de gestión para talleres mecánicos en Costa Rica con cumplimiento fisc
 ### Prerrequisitos
 
 - **Docker** y **Docker Compose** (Recomendado)
-- **O** Node.js 18+ y PostgreSQL 16
+- **O** Node.js 20+ y PostgreSQL 16
 
 ### Setup con Docker (Recomendado)
 
@@ -69,13 +98,43 @@ git checkout dev
 # 3. Copiar variables de entorno
 cp .env.example .env
 
-# 4. Iniciar aplicación
+# 4. Iniciar aplicación (primera vez toma ~2 minutos)
 docker-compose up --build
+
+# El sistema automáticamente:
+# - Crea la base de datos PostgreSQL
+# - Ejecuta las migraciones
+# - Genera el cliente Prisma
+# - Puebla la BD con datos de prueba
+# - Inicia el servidor Next.js
 
 # La aplicación estará disponible en:
 # - Frontend: http://localhost:3000
 # - API Docs: http://localhost:3000/api-docs
 # - PostgreSQL: localhost:5433
+```
+
+### ✨ Datos de Prueba
+
+Al iniciar por primera vez, el sistema crea automáticamente:
+
+- **1 Taller Demo**: "Taller Mecánico Demo"
+- **1 Usuario**: `demo@tallerdemo.cr` / `demo123`
+- **25 Servicios**: Catálogo de servicios automotrices con códigos CABYS
+- **4 Vehículos**: Toyota Corolla, Honda Civic, Hyundai Tucson, Nissan Sentra
+- **3 Clientes**: 2 físicos, 1 jurídico
+- **3 Órdenes**: En estados BORRADOR, ENVIADA, APROBADA
+
+### 🔄 Persistencia de Datos
+
+Los datos se mantienen entre reinicios del contenedor gracias al volumen Docker `postgres_data`. Para limpiar y reiniciar:
+
+```bash
+# Detener y eliminar volúmenes (borra todos los datos)
+docker-compose down -v
+
+# Volver a iniciar (regenera datos de prueba)
+docker-compose up --build
 ```
 
 ### Comandos Útiles
@@ -84,17 +143,28 @@ docker-compose up --build
 # Desarrollo
 docker-compose up --build          # Iniciar aplicación
 docker-compose down                # Detener aplicación
-docker-compose logs -f taller-app  # Ver logs
+docker-compose down -v             # Detener y eliminar volúmenes (borra datos)
+docker-compose logs -f taller-app  # Ver logs en tiempo real
+docker restart taller-app          # Reiniciar solo la app
 
 # Base de datos
-docker exec taller-app npx prisma migrate dev    # Ejecutar migraciones
-docker exec taller-app npx prisma db seed        # Poblar con datos de prueba
-docker exec taller-app npx prisma studio         # Abrir Prisma Studio
+docker exec taller-app npx prisma migrate dev    # Crear nueva migración
+docker exec taller-app npx prisma migrate deploy # Aplicar migraciones
+docker exec taller-app npx prisma db seed        # Re-ejecutar seed (limpia datos existentes)
+docker exec taller-app npx prisma studio         # Abrir Prisma Studio (GUI)
+docker exec taller-app npx prisma generate       # Regenerar cliente Prisma
 
 # Tests
-docker exec taller-app npm test                  # Ejecutar tests
+docker exec taller-app npm test                  # Ejecutar todos los tests
 docker exec taller-app npm run test:watch       # Tests en modo watch
+docker exec taller-app npm run test:property    # Solo property-based tests
 docker exec taller-app npm run lint              # Linter
+docker exec taller-app npm run type-check        # Verificar tipos TypeScript
+
+# Verificar estado
+docker ps                                        # Ver contenedores corriendo
+docker logs taller-app                          # Ver logs completos
+docker exec taller-app node check-db.js         # Verificar datos en BD
 ```
 
 ---
@@ -111,8 +181,8 @@ TallerCR_Kiro/
 │   └── steering/              # Guías de desarrollo
 ├── prisma/                     # Base de datos
 │   ├── schema.prisma          # Esquema de la BD
-│   ├── migrations/            # Migraciones
-│   └── seed.ts                # Datos de prueba
+│   ├── migrations/            # Migraciones SQL
+│   └── seed.ts                # Datos de prueba (auto-ejecutado)
 ├── src/
 │   ├── app/                   # Next.js App Router
 │   │   ├── api/              # API REST endpoints
@@ -127,22 +197,27 @@ TallerCR_Kiro/
 │   │   │   ├── vehiculos/    # Gestión de vehículos
 │   │   │   └── ordenes/      # Gestión de órdenes
 │   │   └── api-docs/         # Swagger UI
-│   ├── components/            # Componentes React
-│   │   ├── ui/               # Componentes base
-│   │   ├── forms/            # Formularios
-│   │   └── layout/           # Layout components
-│   ├── lib/                   # Utilidades
+│   ├── components/            # Componentes React (Atomic Design)
+│   │   ├── ui/               # Atoms: buttons, inputs, badges
+│   │   ├── forms/            # Molecules: form groups
+│   │   └── layout/           # Organisms: header, cards
+│   ├── lib/                   # Utilidades y lógica de negocio
 │   │   ├── prisma/           # Cliente Prisma
 │   │   ├── swagger/          # Configuración Swagger
-│   │   └── fiscal/           # Cálculos fiscales (futuro)
+│   │   ├── fiscal/           # Cálculos fiscales (IVA, CABYS)
+│   │   └── validation/       # Validadores Zod
 │   └── types/                 # TypeScript types
-│       ├── domain/           # Tipos de dominio
-│       └── api/              # Tipos de API
+│       ├── domain/           # Tipos de dominio (Order, Vehicle, Client)
+│       ├── api/              # Tipos de API (requests, responses)
+│       └── index.ts          # Exportaciones centralizadas
 ├── docker-compose.yml         # Docker para desarrollo
-├── Dockerfile                 # Imagen Docker
-├── package.json               # Dependencias
-├── tsconfig.json              # TypeScript config
+├── docker-entrypoint.sh       # Script de inicialización (seed automático)
+├── Dockerfile                 # Imagen Docker multi-stage
+├── check-db.js                # Script para verificar datos en BD
+├── package.json               # Dependencias y scripts
+├── tsconfig.json              # TypeScript config (strict mode)
 ├── tailwind.config.ts         # Tailwind CSS config
+├── jest.config.js             # Jest testing config
 └── README.md                  # Este archivo
 ```
 
@@ -218,12 +293,32 @@ model ServiceLineItem {
 # Crear nueva migración
 docker exec taller-app npx prisma migrate dev --name nombre_migracion
 
-# Aplicar migraciones
+# Aplicar migraciones en producción
 docker exec taller-app npx prisma migrate deploy
 
-# Resetear base de datos (desarrollo)
+# Ver estado de migraciones
+docker exec taller-app npx prisma migrate status
+
+# Resetear base de datos (desarrollo - BORRA TODOS LOS DATOS)
 docker exec taller-app npx prisma migrate reset
 ```
+
+### Seed de Datos
+
+El seed se ejecuta automáticamente en el primer inicio. Para re-ejecutarlo manualmente:
+
+```bash
+# Re-ejecutar seed (LIMPIA Y RECREA todos los datos)
+docker exec taller-app npx prisma db seed
+```
+
+**Datos creados por el seed:**
+- 1 Taller: "Taller Mecánico Demo"
+- 1 Usuario: demo@tallerdemo.cr / demo123
+- 25 Servicios en catálogo con códigos CABYS
+- 4 Vehículos de prueba
+- 3 Clientes (2 físicos, 1 jurídico)
+- 3 Órdenes de servicio en diferentes estados
 
 ---
 
@@ -495,6 +590,23 @@ Las especificaciones del proyecto están en `.kiro/specs/taller-cr-mvp/`:
 
 ---
 
+## 📚 Documentación Completa
+
+Este README es solo el punto de partida. Para información completa, consulta:
+
+- **[DOCS_INDEX.md](./DOCS_INDEX.md)** - Índice de toda la documentación
+- **[CURRENT_STATE.md](./CURRENT_STATE.md)** - Estado actual del proyecto (qué está hecho, qué falta)
+- **[TEST_COVERAGE_REPORT.md](./TEST_COVERAGE_REPORT.md)** - Análisis detallado de cobertura de tests
+- **[HOT_RELOAD_GUIDE.md](./HOT_RELOAD_GUIDE.md)** - Guía de hot reload y desarrollo rápido
+- **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** - Documentación completa de API
+- **[CI_CD_GUIDE.md](./CI_CD_GUIDE.md)** - Guía de CI/CD y deployment
+- **[DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)** - Solución de problemas con Docker
+- **[.kiro/steering/development-workflow.md](./.kiro/steering/development-workflow.md)** - Guía de desarrollo
+- **[.kiro/steering/AGENT_WORKFLOW.md](./.kiro/steering/AGENT_WORKFLOW.md)** - Workflow de commits y CI/CD
+- **[.kiro/specs/taller-cr-mvp/](./kiro/specs/taller-cr-mvp/)** - Especificaciones completas (requirements, design, tasks)
+
+---
+
 ## 🤝 Guía para Nuevos Desarrolladores
 
 ### 1. Setup Inicial (5 minutos)
@@ -585,8 +697,22 @@ docker-compose ps
 # Ver logs de PostgreSQL
 docker-compose logs postgres
 
-# Resetear base de datos
-docker exec taller-app npx prisma migrate reset
+# Verificar datos en la base de datos
+docker exec taller-app node check-db.js
+
+# Resetear base de datos (borra todo y recrea)
+docker-compose down -v
+docker-compose up --build
+```
+
+### Prisma Client no inicializado
+
+```bash
+# Regenerar cliente Prisma
+docker exec taller-app npx prisma generate
+
+# Reiniciar contenedor
+docker restart taller-app
 ```
 
 ### Tests fallan
@@ -598,6 +724,19 @@ docker exec taller-app npm test -- --clearCache
 # Reinstalar dependencias
 docker-compose down
 docker-compose up --build
+```
+
+### Dashboard muestra "0 items"
+
+```bash
+# Verificar que hay datos en la BD
+docker exec taller-app node check-db.js
+
+# Si no hay datos, ejecutar seed
+docker exec taller-app npx prisma db seed
+
+# Reiniciar app
+docker restart taller-app
 ```
 
 ### Más problemas

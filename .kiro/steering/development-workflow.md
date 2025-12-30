@@ -243,6 +243,73 @@ Each acceptance criterion should map to tests:
 
 ---
 
+## Technical Guidance with Context7 MCP Server
+
+**IMPORTANT**: When you need technical advice, documentation, or best practices for any library or framework, use the Context7 MCP server.
+
+### When to Use Context7
+
+Use Context7 for:
+- **Framework documentation**: Next.js, React, TypeScript, Prisma, NextAuth.js
+- **Library usage**: big.js, Zod, fast-check, Jest, Tailwind CSS
+- **Best practices**: Authentication patterns, API design, testing strategies
+- **Error resolution**: Understanding error messages and debugging
+- **Implementation guidance**: How to implement specific features correctly
+
+### How to Use Context7
+
+1. **Resolve library ID first** (if not already known):
+   ```
+   Use mcp_Context7_resolve_library_id with:
+   - libraryName: "next.js" or "prisma" or "nextauth"
+   - query: Your specific question or task
+   ```
+
+2. **Query documentation**:
+   ```
+   Use mcp_Context7_query_docs with:
+   - libraryId: The ID from resolve step (e.g., "/vercel/next.js")
+   - query: Your specific technical question
+   ```
+
+### Examples
+
+**Example 1: NextAuth.js authentication issue**
+```
+Query: "How to properly configure NextAuth.js JWT callbacks with custom user fields"
+Library: "/nextauthjs/next-auth"
+```
+
+**Example 2: Prisma query optimization**
+```
+Query: "Best practices for Prisma queries with relations and filtering"
+Library: "/prisma/prisma"
+```
+
+**Example 3: Next.js API routes**
+```
+Query: "How to handle authentication in Next.js 14 API routes with middleware"
+Library: "/vercel/next.js"
+```
+
+### Context7 Workflow
+
+```
+1. Identify technical question or problem
+   ↓
+2. Resolve library ID (if needed)
+   ↓
+3. Query Context7 with specific question
+   ↓
+4. Apply guidance from documentation
+   ↓
+5. Implement solution following best practices
+```
+
+**Note**: Context7 provides up-to-date documentation and examples. Always prefer Context7 guidance over assumptions when working with external libraries.
+
+---
+
 ## Before Starting Any Task
 
 1. **Read the spec files**
@@ -255,7 +322,12 @@ Each acceptance criterion should map to tests:
    - Identify which properties to validate
    - Know what tests are needed (unit vs property)
 
-3. **Update task status**
+3. **Consult Context7 for technical guidance** (if needed)
+   - Query relevant library documentation
+   - Understand best practices for the technology
+   - Review examples and patterns
+
+4. **Update task status**
    - Mark task as `in_progress` when starting
 
 ---
@@ -295,6 +367,58 @@ Each acceptance criterion should map to tests:
 
 ---
 
+## Data Persistence & Seeding
+
+### Automatic Seeding on First Startup
+
+The project uses `docker-entrypoint.sh` to automatically:
+1. Wait for PostgreSQL to be ready
+2. Generate Prisma Client
+3. Run migrations
+4. Execute seed script (creates demo data)
+5. Start Next.js server
+
+**Seed Data Created:**
+- 1 Taller: "Taller Mecánico Demo"
+- 1 User: demo@tallerdemo.cr / demo123
+- 25 Services with CABYS codes
+- 4 Vehicles (Toyota, Honda, Hyundai, Nissan)
+- 3 Clients (2 physical, 1 legal entity)
+- 3 Orders in different states
+
+### Data Persistence
+
+Data persists between container restarts in the `postgres_data` Docker volume.
+
+```powershell
+# Check if data exists
+docker exec taller-app node check-db.js
+
+# Re-run seed (CLEARS existing data)
+docker exec taller-app npx prisma db seed
+
+# Clean start (removes volume, forces fresh seed)
+docker-compose down -v
+docker-compose up --build
+```
+
+---
+
+## Error Logging in Frontend
+
+All dashboard pages now include error logging in catch blocks:
+
+```typescript
+.catch((error) => {
+  console.error('Error fetching data:', error)
+  // Handle error appropriately
+})
+```
+
+This helps debug issues when data doesn't load. Check browser DevTools Console (F12) for errors.
+
+---
+
 ## Key Commands (Windows/PowerShell)
 
 ```powershell
@@ -311,10 +435,15 @@ npm run lint -- --fix
 npm run type-check
 
 # Docker commands
-docker-compose up --build
-docker exec taller-app npm test
-docker exec taller-app npx prisma migrate dev
-docker exec taller-app npx prisma db seed
+docker-compose up --build                    # Start application
+docker-compose down                          # Stop application
+docker-compose down -v                       # Stop and remove volumes (deletes data)
+docker restart taller-app                    # Restart only the app
+docker exec taller-app npm test              # Run tests
+docker exec taller-app npx prisma migrate dev # Create migration
+docker exec taller-app npx prisma db seed    # Re-run seed
+docker exec taller-app npx prisma generate   # Regenerate Prisma client
+docker exec taller-app node check-db.js      # Verify database data
 
 # Test API endpoints
 Invoke-RestMethod -Uri "http://localhost:3000/api/health"

@@ -6,12 +6,7 @@
 
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma/client'
-
-// Demo taller ID - in production this would come from auth session
-const DEMO_TALLER_ID = async () => {
-  const taller = await prisma.taller.findFirst()
-  return taller?.id
-}
+import { getCurrentTallerId } from '@/lib/auth/session'
 
 /**
  * @swagger
@@ -28,8 +23,8 @@ const DEMO_TALLER_ID = async () => {
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/DashboardStats'
- *       404:
- *         description: Taller not found
+ *       401:
+ *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
@@ -43,11 +38,23 @@ const DEMO_TALLER_ID = async () => {
  */
 export async function GET() {
   try {
-    const tallerId = await DEMO_TALLER_ID()
+    console.log('📊 [Dashboard] Fetching stats...')
+    
+    let tallerId: string
+    try {
+      tallerId = await getCurrentTallerId()
+      console.log('📊 [Dashboard] TallerId:', tallerId)
+    } catch (error) {
+      console.error('❌ [Dashboard] Failed to get tallerId:', error)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     
     if (!tallerId) {
-      return NextResponse.json({ error: 'Taller not found' }, { status: 404 })
+      console.error('❌ [Dashboard] No tallerId found')
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    console.log('📊 [Dashboard] Fetching data for taller:', tallerId)
 
     // Get counts
     const [ordersCount, vehiclesCount, clientsCount, recentOrders] = await Promise.all([
@@ -67,6 +74,8 @@ export async function GET() {
       })
     ])
 
+    console.log('📊 [Dashboard] Stats:', { ordersCount, vehiclesCount, clientsCount, recentOrdersCount: recentOrders.length })
+
     // Calculate today's revenue (completed orders)
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
@@ -81,6 +90,8 @@ export async function GET() {
     })
     
     const todayRevenue = todayOrders.reduce((sum, o) => sum + (o.totalCentimos || 0), 0)
+
+    console.log('✅ [Dashboard] Stats fetched successfully')
 
     return NextResponse.json({
       stats: {
@@ -102,7 +113,7 @@ export async function GET() {
       }))
     })
   } catch (error) {
-    console.error('Dashboard stats error:', error)
+    console.error('❌ [Dashboard] Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

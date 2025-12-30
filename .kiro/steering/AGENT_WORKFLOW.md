@@ -409,13 +409,80 @@ it('should calculate IVA as exactly 13% of subtotal', () => {
 - Updates configuration
 - Maintenance tasks
 
+## Recent Fixes and Solutions (December 2024)
+
+### Fix 1: Data Persistence Implementation
+
+**Problem**: Database data was not persisting between container restarts.
+
+**Solution**:
+- Created `docker-entrypoint.sh` script that:
+  - Waits for PostgreSQL with `pg_isready`
+  - Generates Prisma Client
+  - Runs migrations
+  - Executes seed script automatically
+  - Starts Next.js server
+- Updated Dockerfile to use entrypoint script
+- Data now persists in `postgres_data` Docker volume
+
+**Files Modified**:
+- `docker-entrypoint.sh` (created)
+- `Dockerfile` (added entrypoint)
+- `prisma/seed.ts` (fixed enum imports)
+
+### Fix 2: Frontend Error Logging
+
+**Problem**: Errors were silenced in catch blocks, making debugging difficult.
+
+**Solution**:
+- Added `console.error()` logging to all catch blocks in dashboard pages
+- Errors now visible in browser DevTools Console
+- Helps identify API failures and data loading issues
+
+**Files Modified**:
+- `src/app/dashboard/page.tsx`
+- `src/app/dashboard/ordenes/page.tsx`
+- `src/app/dashboard/vehiculos/page.tsx`
+
+### Fix 3: Prisma Client Initialization
+
+**Problem**: Prisma client not initialized after container restart.
+
+**Solution**:
+- Entrypoint script runs `npx prisma generate` on every startup
+- Ensures client is always available before app starts
+
+### Fix 4: Docker Build Failures
+
+**Problem**: Multiple issues preventing Docker image build:
+- Prisma generate required DATABASE_URL during build
+- Node 18 vs Node 20 incompatibility
+- Desynchronized package-lock.json
+- ESLint deprecation warnings
+
+**Solution**:
+- Added dummy DATABASE_URL in Dockerfile for build stage
+- Updated to Node 20 in Dockerfile and CI
+- Regenerated clean package-lock.json
+- Aligned ESLint versions
+- Disabled coverage in CI (babel-plugin-istanbul incompatible with Node 20)
+
+**Files Modified**:
+- `Dockerfile`
+- `.github/workflows/ci-cd.yml`
+- `package.json`
+- `package-lock.json`
+- `prisma.config.ts`
+
+---
+
 ## Health Check Endpoint
 
 **After implementing features, verify the application is running:**
 
-```bash
+```powershell
 # Check health endpoint
-curl http://localhost:3000/api/health
+Invoke-RestMethod -Uri "http://localhost:3000/api/health"
 
 # Expected response (200 OK):
 {
@@ -431,6 +498,27 @@ curl http://localhost:3000/api/health
   }
 }
 ```
+
+---
+
+## Database Verification
+
+**Check if data exists in database:**
+
+```powershell
+# Run verification script
+docker exec taller-app node check-db.js
+
+# Expected output:
+# ✅ Talleres: 1
+# ✅ Users: 1
+# ✅ Services: 25
+# ✅ Vehicles: 4
+# ✅ Clients: 3
+# ✅ Orders: 3
+```
+
+---
 
 ## Handling Merge Conflicts
 
@@ -480,15 +568,23 @@ The Kiro agent should:
 
 | Action | Command |
 |--------|---------|
-| Run all tests | `npm test` |
-| Run specific tests | `npm test -- --testPathPattern="fiscal"` |
-| Run with coverage | `npm test -- --coverage` |
-| Clear Jest cache | `npm test -- --clearCache` |
-| Run linter | `npm run lint` |
-| Fix linting issues | `npm run lint -- --fix` |
+| Run all tests | `docker exec taller-app npm test` |
+| Run specific tests | `docker exec taller-app npm test -- --testPathPattern="fiscal"` |
+| Run with coverage | `docker exec taller-app npm test -- --coverage` |
+| Clear Jest cache | `docker exec taller-app npm test -- --clearCache` |
+| Run linter | `docker exec taller-app npm run lint` |
+| Fix linting issues | `docker exec taller-app npm run lint -- --fix` |
 | Build Docker image | `docker build -t taller-pro-cr:dev .` |
 | Run Docker container | `docker-compose up --build` |
-| Check health endpoint | `curl http://localhost:3000/api/health` |
+| Stop Docker container | `docker-compose down` |
+| Clean restart (deletes data) | `docker-compose down -v && docker-compose up --build` |
+| Restart app only | `docker restart taller-app` |
+| Check health endpoint | `Invoke-RestMethod -Uri "http://localhost:3000/api/health"` |
+| Verify database data | `docker exec taller-app node check-db.js` |
+| Re-run seed | `docker exec taller-app npx prisma db seed` |
+| Regenerate Prisma client | `docker exec taller-app npx prisma generate` |
+| Open Prisma Studio | `docker exec taller-app npx prisma studio` |
+| View logs | `docker-compose logs -f taller-app` |
 | View GitHub Actions | https://github.com/Huevaldinho/TallerCR_Kiro/actions |
 | View container registry | https://github.com/Huevaldinho/TallerCR_Kiro/pkgs/container/TallerCR_Kiro |
 

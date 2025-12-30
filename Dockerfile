@@ -17,10 +17,17 @@ WORKDIR /app
 
 # Install all dependencies (including devDependencies) with legacy peer deps
 COPY package.json package-lock.json* ./
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
+
+# Install postgresql-client for pg_isready
+RUN apk add --no-cache postgresql-client
 
 # Copy source code
 COPY . .
+
+# Copy entrypoint script
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Expose port
 EXPOSE 3000
@@ -29,8 +36,8 @@ EXPOSE 3000
 ENV NODE_ENV=development
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Start development server with hot reload
-CMD ["npm", "run", "dev"]
+# Start development server with entrypoint
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 # Production builder
 FROM base AS builder

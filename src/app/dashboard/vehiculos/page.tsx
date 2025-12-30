@@ -22,6 +22,7 @@ export default function VehiculosPage() {
       setVehicles(data.vehicles || [])
     } catch (error) {
       console.error('Error fetching vehicles:', error)
+      setVehicles([])
     }
     setLoading(false)
   }

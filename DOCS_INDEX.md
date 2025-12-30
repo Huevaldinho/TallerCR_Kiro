@@ -1,318 +1,291 @@
-# 📚 Índice de Documentación - Taller Pro CR
+# Documentation Index - Taller Pro CR
 
-Este documento te guía a través de toda la documentación disponible del proyecto.
-
----
-
-## 🚀 Para Empezar (Nuevos Desarrolladores)
-
-**Lee en este orden:**
-
-1. **[README.md](./README.md)** ⭐ **EMPIEZA AQUÍ**
-   - Visión general del proyecto
-   - Setup rápido con Docker
-   - Comandos básicos
-   - Estructura del proyecto
-
-2. **[.kiro/steering/development-workflow.md](./.kiro/steering/development-workflow.md)**
-   - Comandos de PowerShell (Windows)
-   - Patrones de diseño
-   - Testing strategy
-   - Convenciones de código
-
-3. **[DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)**
-   - Problemas comunes con Docker
-   - Soluciones paso a paso
+Quick reference guide to all project documentation.
 
 ---
 
-## 📖 Documentación por Tema
+## 📖 Start Here
 
-### 🗄️ Base de Datos
+### For New Developers
 
-| Documento | Descripción |
-|-----------|-------------|
-| `prisma/schema.prisma` | Esquema completo de la base de datos |
-| `prisma/migrations/` | Historial de cambios en la BD |
-| `prisma/seed.ts` | Datos de prueba |
+1. **[README.md](./README.md)** - Project overview, setup, and quick start
+2. **[CURRENT_STATE.md](./CURRENT_STATE.md)** - What's done, what's pending, priorities
+3. **[development-workflow.md](./.kiro/steering/development-workflow.md)** - Development guide
 
-**Comandos útiles:**
-```bash
-# Ver esquema en navegador
-docker exec taller-app npx prisma studio
+### For Continuing Development
 
-# Crear migración
-docker exec taller-app npx prisma migrate dev --name nombre
-
-# Aplicar migraciones
-docker exec taller-app npx prisma migrate deploy
-```
+1. **[CURRENT_STATE.md](./CURRENT_STATE.md)** - Check current status
+2. **[tasks.md](./.kiro/specs/taller-cr-mvp/tasks.md)** - Pick a task
+3. **[requirements.md](./.kiro/specs/taller-cr-mvp/requirements.md)** - Understand requirements
+4. **[design.md](./.kiro/specs/taller-cr-mvp/design.md)** - Understand design
 
 ---
 
-### 🔌 API REST
+## 📚 Documentation by Category
 
-| Documento | Descripción |
-|-----------|-------------|
-| **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** | Documentación completa de todos los endpoints |
-| `http://localhost:3000/api-docs` | Swagger UI interactivo (cuando la app está corriendo) |
-| `src/app/api/` | Código fuente de los endpoints |
+### Getting Started
 
-**Endpoints principales:**
-- `/api/clientes` - Gestión de clientes
-- `/api/vehiculos` - Gestión de vehículos
-- `/api/ordenes` - Gestión de órdenes
-- `/api/dashboard/stats` - Estadísticas
-- `/api/health` - Health check
+| Document | Purpose | When to Read |
+|----------|---------|--------------|
+| [README.md](./README.md) | Project overview, setup instructions | First time setup |
+| [CURRENT_STATE.md](./CURRENT_STATE.md) | Current implementation status | Before starting work |
+| [TEST_COVERAGE_REPORT.md](./TEST_COVERAGE_REPORT.md) | Detailed test coverage analysis | Before writing tests |
+| [HOT_RELOAD_GUIDE.md](./HOT_RELOAD_GUIDE.md) | Hot reload setup and troubleshooting | Daily development |
+| [.env.example](./.env.example) | Environment variables template | During setup |
 
----
+### Development Guides
 
-### 🎨 Frontend
+| Document | Purpose | When to Read |
+|----------|---------|--------------|
+| [development-workflow.md](./.kiro/steering/development-workflow.md) | Development practices, commands, patterns | Daily development |
+| [AGENT_WORKFLOW.md](./.kiro/steering/AGENT_WORKFLOW.md) | Commit workflow, CI/CD, testing | Before committing |
+| [DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md) | Docker issues and solutions | When Docker problems occur |
 
-| Documento | Descripción |
-|-----------|-------------|
-| `src/app/dashboard/` | Páginas del dashboard |
-| `src/components/` | Componentes reutilizables |
-| `tailwind.config.ts` | Configuración de estilos |
+### Specifications
 
-**Estructura:**
-```
-src/app/dashboard/
-├── clientes/          # Gestión de clientes
-│   ├── page.tsx      # Listado
-│   ├── nuevo/        # Crear
-│   ├── [id]/         # Detalles
-│   └── [id]/editar/  # Editar
-├── vehiculos/         # Gestión de vehículos (misma estructura)
-└── ordenes/           # Gestión de órdenes (misma estructura)
-```
+| Document | Purpose | When to Read |
+|----------|---------|--------------|
+| [requirements.md](./.kiro/specs/taller-cr-mvp/requirements.md) | User stories, acceptance criteria | Before implementing features |
+| [design.md](./.kiro/specs/taller-cr-mvp/design.md) | Architecture, components, data models | Before implementing features |
+| [tasks.md](./.kiro/specs/taller-cr-mvp/tasks.md) | Implementation tasks, milestones | When picking next task |
 
----
+### API & Technical
 
-### 🧪 Testing
+| Document | Purpose | When to Read |
+|----------|---------|--------------|
+| [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) | API endpoints, schemas, examples | When working with API |
+| [Swagger UI](http://localhost:3000/api-docs) | Interactive API documentation | When testing API |
+| [prisma/schema.prisma](./prisma/schema.prisma) | Database schema | When working with data |
 
-| Documento | Descripción |
-|-----------|-------------|
-| `jest.config.js` | Configuración de Jest |
-| `src/**/__tests__/` | Tests unitarios |
-| `.kiro/steering/development-workflow.md` | Testing strategy |
+### DevOps & CI/CD
 
-**Comandos:**
-```bash
-# Ejecutar todos los tests
-docker exec taller-app npm test
-
-# Tests en modo watch
-docker exec taller-app npm run test:watch
-
-# Tests con cobertura
-docker exec taller-app npm test -- --coverage
-```
+| Document | Purpose | When to Read |
+|----------|---------|--------------|
+| [CI_CD_GUIDE.md](./CI_CD_GUIDE.md) | CI/CD pipeline, deployment | When setting up CI/CD |
+| [.github/workflows/ci-cd.yml](./.github/workflows/ci-cd.yml) | GitHub Actions workflow | When modifying CI/CD |
+| [Dockerfile](./Dockerfile) | Docker image configuration | When modifying Docker setup |
+| [docker-compose.yml](./docker-compose.yml) | Docker services configuration | When modifying services |
 
 ---
 
-### 🔄 CI/CD y DevOps
+## 🎯 Quick Links by Task
 
-| Documento | Descripción |
-|-----------|-------------|
-| **[CI_CD_GUIDE.md](./CI_CD_GUIDE.md)** | Guía completa de CI/CD |
-| **[.kiro/steering/AGENT_WORKFLOW.md](./.kiro/steering/AGENT_WORKFLOW.md)** | Workflow de commits y pipeline |
-| `.github/workflows/ci-cd.yml` | Configuración de GitHub Actions |
-| `.github/BRANCH_PROTECTION.md` | Reglas de protección de ramas |
+### "I want to..."
 
-**Pipeline automático:**
-1. Push a `dev` → Tests automáticos
-2. Tests pasan → Build de Docker image
-3. Image se sube a GitHub Container Registry
+#### Setup & Installation
 
-**Ver estado:** https://github.com/Huevaldinho/TallerCR_Kiro/actions
+- **Setup the project** → [README.md - Inicio Rápido](./README.md#-inicio-rápido)
+- **Fix Docker issues** → [DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)
+- **Understand the data model** → [prisma/schema.prisma](./prisma/schema.prisma)
 
----
+#### Development
 
-### 🇨🇷 Formatos Costa Rica
+- **Start developing** → [development-workflow.md](./.kiro/steering/development-workflow.md)
+- **Use hot reload** → [HOT_RELOAD_GUIDE.md](./HOT_RELOAD_GUIDE.md)
+- **Pick a task** → [tasks.md](./.kiro/specs/taller-cr-mvp/tasks.md)
+- **Understand requirements** → [requirements.md](./.kiro/specs/taller-cr-mvp/requirements.md)
+- **Understand architecture** → [design.md](./.kiro/specs/taller-cr-mvp/design.md)
+- **See what's done** → [CURRENT_STATE.md](./CURRENT_STATE.md)
 
-| Formato | Descripción | Ejemplo |
-|---------|-------------|---------|
-| Cédula Física | `#-####-####` | `1-1234-5678` |
-| Cédula Jurídica | `#-###-######` | `3-101-123456` |
-| DIMEX | `############` | `123456789012` |
-| NITE | `##########` | `1234567890` |
-| Pasaporte | Alfanumérico | `AB123456` |
-| Placa Particular | `ABC-123` | `ABC-123` |
-| Placa Taxi | `TX-####` | `TX-1234` |
-| Placa Moto | `A-#####` | `M-12345` |
-| Teléfono | `+506 ####-####` | `+506 8888-8888` |
-| CABYS | 13 dígitos | `8527101010000` |
+#### Testing
 
----
+- **Run tests** → [README.md - Testing](./README.md#-testing)
+- **See test coverage** → [TEST_COVERAGE_REPORT.md](./TEST_COVERAGE_REPORT.md)
+- **Write tests** → [development-workflow.md - Testing Strategy](./.kiro/steering/development-workflow.md#testing-strategy)
+- **Understand test approach** → [design.md - Testing Strategy](./.kiro/specs/taller-cr-mvp/design.md#testing-strategy)
 
-### 💰 Manejo de Dinero
+#### API
 
-**Regla de oro:** Todos los montos se almacenan en **centimos** (enteros).
+- **Use the API** → [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
+- **Test endpoints** → [Swagger UI](http://localhost:3000/api-docs)
+- **Understand API design** → [design.md - Components and Interfaces](./.kiro/specs/taller-cr-mvp/design.md#components-and-interfaces)
 
-```typescript
-// ₡15,000.00 se almacena como 1500000 centimos
-const precioEnCentimos = 1500000
-const precioDisplay = precioEnCentimos / 100  // 15000.00
+#### Deployment
 
-// Cálculo de IVA (13%)
-const iva = Math.round(subtotalCentimos * 0.13)
+- **Deploy the app** → [CI_CD_GUIDE.md](./CI_CD_GUIDE.md)
+- **Understand CI/CD** → [AGENT_WORKFLOW.md - CI/CD Pipeline](./.kiro/steering/AGENT_WORKFLOW.md#workflow-phases)
+- **Fix CI/CD issues** → [CI_CD_GUIDE.md - Troubleshooting](./CI_CD_GUIDE.md)
 
-// Formato para display
-function formatCurrency(centimos: number | null): string {
-  if (!centimos) return '₡0'
-  return `₡${(centimos / 100).toLocaleString('es-CR')}`
-}
-```
+#### Troubleshooting
 
-**¿Por qué centimos?**
-- Evita errores de redondeo con decimales
-- Precisión exacta en cálculos fiscales
-- Compatible con PostgreSQL (INTEGER)
+- **Docker problems** → [DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md)
+- **Database issues** → [DOCKER_TROUBLESHOOTING.md - Problema 2](./DOCKER_TROUBLESHOOTING.md#problema-2-base-de-datos-no-muestra-datos)
+- **Test failures** → [AGENT_WORKFLOW.md - Understanding Test Failures](./.kiro/steering/AGENT_WORKFLOW.md#understanding-test-failures)
+- **General issues** → [README.md - Troubleshooting](./README.md#-troubleshooting)
 
 ---
 
-### 📋 Especificaciones (Specs)
+## 📋 Checklists
 
-Las especificaciones del proyecto están en `.kiro/specs/taller-cr-mvp/`:
+### Before Starting Development
 
-| Archivo | Descripción |
-|---------|-------------|
-| **requirements.md** | Requisitos del sistema en formato EARS |
-| **design.md** | Diseño de arquitectura y componentes |
-| **tasks.md** | Lista de tareas de implementación |
+- [ ] Read [README.md](./README.md)
+- [ ] Read [CURRENT_STATE.md](./CURRENT_STATE.md)
+- [ ] Setup project with Docker
+- [ ] Verify app works: http://localhost:3000
+- [ ] Check database has data: `docker exec taller-app node check-db.js`
+- [ ] Read [development-workflow.md](./.kiro/steering/development-workflow.md)
 
-**Formato EARS (Easy Approach to Requirements Syntax):**
-- `THE [System] SHALL [response]` - Requisito universal
-- `WHEN [trigger], THE [System] SHALL [response]` - Requisito por evento
-- `WHILE [condition], THE [System] SHALL [response]` - Requisito por estado
-- `IF [condition], THEN THE [System] SHALL [response]` - Manejo de errores
+### Before Implementing a Feature
 
----
+- [ ] Read [tasks.md](./.kiro/specs/taller-cr-mvp/tasks.md) - Pick task
+- [ ] Read [requirements.md](./.kiro/specs/taller-cr-mvp/requirements.md) - Understand requirements
+- [ ] Read [design.md](./.kiro/specs/taller-cr-mvp/design.md) - Understand design
+- [ ] Mark task as `in_progress` in tasks.md
+- [ ] Create feature branch: `git checkout -b feature/my-feature`
 
-## 🛠️ Guías de Trabajo
+### Before Committing
 
-### Para Desarrollar una Nueva Feature
+- [ ] Run tests: `docker exec taller-app npm test`
+- [ ] Run linter: `docker exec taller-app npm run lint`
+- [ ] Check types: `docker exec taller-app npm run type-check`
+- [ ] Write meaningful commit message (see [AGENT_WORKFLOW.md](./.kiro/steering/AGENT_WORKFLOW.md))
+- [ ] Reference requirements/properties in commit
+- [ ] Mark task as `completed` in tasks.md
 
-1. **Leer la spec** en `.kiro/specs/taller-cr-mvp/`
-2. **Crear rama:** `git checkout -b feature/nombre-feature`
-3. **Implementar** siguiendo el diseño
-4. **Escribir tests** (unitarios y property-based)
-5. **Ejecutar tests:** `docker exec taller-app npm test`
-6. **Commit:** `git commit -m "feat: descripción"`
-7. **Push y crear PR:** `git push origin feature/nombre-feature`
+### Before Creating PR
 
-### Para Arreglar un Bug
-
-1. **Reproducir el bug** localmente
-2. **Crear rama:** `git checkout -b fix/nombre-bug`
-3. **Escribir test** que falle (reproduce el bug)
-4. **Arreglar el código** hasta que el test pase
-5. **Commit:** `git commit -m "fix: descripción del bug"`
-6. **Push y crear PR**
-
-### Para Actualizar la Base de Datos
-
-1. **Modificar** `prisma/schema.prisma`
-2. **Crear migración:** `docker exec taller-app npx prisma migrate dev --name nombre`
-3. **Verificar** que la migración se aplicó correctamente
-4. **Actualizar tipos:** `docker exec taller-app npx prisma generate`
-5. **Commit** tanto el schema como la migración
+- [ ] All tests pass
+- [ ] Linter passes
+- [ ] Documentation updated if needed
+- [ ] Commit messages follow format
+- [ ] Branch is up to date with dev
 
 ---
 
-## 🔍 Dónde Encontrar Cosas
+## 🔍 Finding Information
 
-### "¿Dónde está el código de...?"
+### By Topic
 
-| Funcionalidad | Ubicación |
-|---------------|-----------|
-| Listado de clientes | `src/app/dashboard/clientes/page.tsx` |
-| Crear cliente | `src/app/dashboard/clientes/nuevo/page.tsx` |
-| Detalles de cliente | `src/app/dashboard/clientes/[id]/page.tsx` |
-| Editar cliente | `src/app/dashboard/clientes/[id]/editar/page.tsx` |
-| API de clientes | `src/app/api/clientes/route.ts` |
-| API de cliente específico | `src/app/api/clientes/[id]/route.ts` |
-| Tipos de cliente | `src/types/domain/clients.ts` |
-| Esquema de BD | `prisma/schema.prisma` |
+#### Costa Rica Formats
 
-**Nota:** Vehículos y órdenes siguen la misma estructura.
+- **Cédulas, DIMEX, NITE** → [README.md - Formatos Costa Rica](./README.md#-formatos-costa-rica)
+- **Validation logic** → [design.md - Validation Utilities](./.kiro/specs/taller-cr-mvp/design.md#13-validation-utilities)
+- **Format patterns** → [design.md - TypeScript Type Definitions](./.kiro/specs/taller-cr-mvp/design.md#typescript-type-definitions)
 
-### "¿Dónde están los estilos?"
+#### Monetary Calculations
 
-- **Configuración:** `tailwind.config.ts`
-- **Estilos globales:** `src/app/globals.css`
-- **Componentes:** Usan Tailwind CSS inline
+- **Storage in centimos** → [README.md - Precisión Monetaria](./README.md#-precisión-monetaria)
+- **IVA calculation** → [design.md - Fiscal Calculation Service](./.kiro/specs/taller-cr-mvp/design.md#fiscal-calculation-service)
+- **Error handling** → [design.md - Monetary Precision Best Practices](./.kiro/specs/taller-cr-mvp/design.md#error-handling)
 
-### "¿Dónde están los tests?"
+#### Database
 
-- **Tests unitarios:** `src/**/__tests__/*.test.ts`
-- **Property-based tests:** `src/**/__tests__/*.property.ts`
-- **Configuración:** `jest.config.js`
+- **Schema** → [prisma/schema.prisma](./prisma/schema.prisma)
+- **Models** → [README.md - Modelos Principales](./README.md#modelos-principales)
+- **Migrations** → [README.md - Migraciones](./README.md#migraciones)
+- **Seed data** → [prisma/seed.ts](./prisma/seed.ts)
+
+#### Testing
+
+- **Running tests** → [README.md - Testing](./README.md#-testing)
+- **Writing tests** → [development-workflow.md - Testing Strategy](./.kiro/steering/development-workflow.md#testing-strategy)
+- **Property-based tests** → [design.md - Property-Based Testing](./.kiro/specs/taller-cr-mvp/design.md#property-based-testing-configuration)
+- **Test examples** → [development-workflow.md - Test Types](./.kiro/steering/development-workflow.md#test-types--when-to-use)
+
+#### Architecture
+
+- **High-level** → [design.md - Architecture](./design.md#architecture)
+- **Components** → [design.md - Components and Interfaces](./.kiro/specs/taller-cr-mvp/design.md#components-and-interfaces)
+- **Data models** → [design.md - Data Models](./.kiro/specs/taller-cr-mvp/design.md#data-models)
+- **Project structure** → [README.md - Estructura del Proyecto](./README.md#-estructura-del-proyecto)
 
 ---
 
-## 🆘 Ayuda Rápida
+## 🚀 Common Commands
 
-### Comandos Más Usados
+### Development
 
 ```bash
-# Iniciar aplicación
+# Start application
 docker-compose up --build
 
-# Ver logs
+# View logs
 docker-compose logs -f taller-app
 
-# Ejecutar tests
+# Run tests
 docker exec taller-app npm test
 
-# Acceder a la base de datos
-docker exec taller-app npx prisma studio
+# Run linter
+docker exec taller-app npm run lint
 
-# Ver documentación de API
-# Abrir: http://localhost:3000/api-docs
-
-# Limpiar todo y empezar de nuevo
-docker-compose down -v
-docker system prune -a
-docker-compose up --build
+# Check database
+docker exec taller-app node check-db.js
 ```
 
-### Problemas Comunes
+### Database
 
-| Problema | Solución |
-|----------|----------|
-| Docker no inicia | Ver [DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md) |
-| Tests fallan | `docker exec taller-app npm test -- --clearCache` |
-| BD no conecta | `docker-compose down -v && docker-compose up --build` |
-| Cambios no se reflejan | Reiniciar contenedor: `docker-compose restart taller-app` |
-| Puerto 3000 ocupado | Cambiar puerto en `docker-compose.yml` |
+```bash
+# Run migrations
+docker exec taller-app npx prisma migrate dev
 
----
+# Run seed
+docker exec taller-app npx prisma db seed
 
-## 📞 Contacto
+# Regenerate Prisma client
+docker exec taller-app npx prisma generate
 
-- **Issues:** https://github.com/Huevaldinho/TallerCR_Kiro/issues
-- **Pull Requests:** https://github.com/Huevaldinho/TallerCR_Kiro/pulls
+# Open Prisma Studio
+docker exec taller-app npx prisma studio
+```
 
----
+### Troubleshooting
 
-## ✅ Checklist para Nuevos Desarrolladores
+```bash
+# Restart app
+docker restart taller-app
 
-- [ ] Leí el [README.md](./README.md)
-- [ ] Instalé Docker Desktop
-- [ ] Cloné el repositorio
-- [ ] Ejecuté `docker-compose up --build`
-- [ ] Abrí http://localhost:3000 y funciona
-- [ ] Abrí http://localhost:3000/api-docs y veo Swagger
-- [ ] Ejecuté `docker exec taller-app npm test` y los tests pasan
-- [ ] Leí [development-workflow.md](./.kiro/steering/development-workflow.md)
-- [ ] Exploré el código en `src/app/dashboard/`
-- [ ] Revisé el esquema de BD en `prisma/schema.prisma`
-- [ ] Entiendo cómo crear una rama y hacer un PR
+# Clean restart (deletes data)
+docker-compose down -v
+docker-compose up --build
 
-**¡Listo para empezar a desarrollar!** 🚀
+# View all logs
+docker-compose logs
+
+# Check health
+curl http://localhost:3000/api/health
+```
 
 ---
 
-**Última actualización:** Diciembre 2024
+## 📞 Getting Help
+
+### Documentation Not Clear?
+
+1. Check [CURRENT_STATE.md](./CURRENT_STATE.md) for latest status
+2. Check [DOCKER_TROUBLESHOOTING.md](./DOCKER_TROUBLESHOOTING.md) for common issues
+3. Search in [README.md](./README.md) for keywords
+4. Check [design.md](./.kiro/specs/taller-cr-mvp/design.md) for technical details
+
+### Still Stuck?
+
+1. Check GitHub Issues: https://github.com/Huevaldinho/TallerCR_Kiro/issues
+2. Check GitHub Actions logs: https://github.com/Huevaldinho/TallerCR_Kiro/actions
+3. Review recent commits for similar work
+4. Ask in team chat
+
+---
+
+## 📝 Document Maintenance
+
+### When to Update Documentation
+
+- **README.md** - When adding features, changing setup, or fixing major issues
+- **CURRENT_STATE.md** - After completing milestones or major features
+- **API_DOCUMENTATION.md** - When adding/modifying API endpoints
+- **DOCKER_TROUBLESHOOTING.md** - When discovering new Docker issues
+- **tasks.md** - When completing tasks or adding new ones
+- **This file (DOCS_INDEX.md)** - When adding new documentation
+
+### Documentation Owners
+
+- **README.md** - Team lead
+- **CURRENT_STATE.md** - Project manager
+- **Specs (requirements, design, tasks)** - Product owner
+- **Technical docs (API, Docker, CI/CD)** - Tech lead
+- **Workflow docs** - Development team
+
+---
+
+**Last Updated:** December 21, 2024  
+**Maintained by:** Development Team

@@ -6,11 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma/client'
-
-const DEMO_TALLER_ID = async () => {
-  const taller = await prisma.taller.findFirst()
-  return taller?.id
-}
+import { getCurrentTallerId } from '@/lib/auth/session'
 
 /**
  * @swagger
@@ -39,8 +35,8 @@ const DEMO_TALLER_ID = async () => {
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Vehicle'
- *       404:
- *         description: Taller not found
+ *       401:
+ *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
@@ -54,9 +50,9 @@ const DEMO_TALLER_ID = async () => {
  */
 export async function GET(request: NextRequest) {
   try {
-    const tallerId = await DEMO_TALLER_ID()
+    const tallerId = await getCurrentTallerId()
     if (!tallerId) {
-      return NextResponse.json({ error: 'Taller not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -123,8 +119,8 @@ export async function GET(request: NextRequest) {
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *       404:
- *         description: Taller not found
+ *       401:
+ *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
@@ -138,9 +134,9 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const tallerId = await DEMO_TALLER_ID()
+    const tallerId = await getCurrentTallerId()
     if (!tallerId) {
-      return NextResponse.json({ error: 'Taller not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()

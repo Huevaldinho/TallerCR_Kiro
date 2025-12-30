@@ -6,17 +6,13 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma/client'
-
-const DEMO_TALLER_ID = async () => {
-  const taller = await prisma.taller.findFirst()
-  return taller?.id
-}
+import { getCurrentTallerId } from '@/lib/auth/session'
 
 export async function GET() {
   try {
-    const tallerId = await DEMO_TALLER_ID()
+    const tallerId = await getCurrentTallerId()
     if (!tallerId) {
-      return NextResponse.json({ error: 'Taller not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // ✅ CORRECTO: Usar include para traer todas las relaciones
@@ -40,9 +36,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const tallerId = await DEMO_TALLER_ID()
+    const tallerId = await getCurrentTallerId()
     if (!tallerId) {
-      return NextResponse.json({ error: 'Taller not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
@@ -85,7 +81,7 @@ export async function POST(request: NextRequest) {
     })
 
     // ✅ TRANSACCIÓN: Crear orden con line items de forma atómica
-    const order = await prisma.$transaction(async (tx) => {
+    const order = await prisma.$transaction(async (tx: any) => {
       // Generate order number dentro de la transacción
       const count = await tx.serviceOrder.count({ where: { tallerId } })
       const orderNumber = `ORD-${new Date().getFullYear()}-${String(count + 1).padStart(3, '0')}`

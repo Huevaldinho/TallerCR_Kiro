@@ -1,4 +1,4 @@
-import { PrismaClient, TipoIdentificacion, OrderStatus } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
@@ -147,7 +147,7 @@ async function main() {
       data: {
         tallerId: taller.id,
         nombreCompleto: 'María González Rodríguez',
-        tipoIdentificacion: TipoIdentificacion.FISICA,
+        tipoIdentificacion: 'FISICA',
         numeroIdentificacion: '1-1234-5678',
         telefono: '+506 7777-7777',
         email: 'maria@email.com',
@@ -157,7 +157,7 @@ async function main() {
       data: {
         tallerId: taller.id,
         nombreCompleto: 'Carlos Jiménez Mora',
-        tipoIdentificacion: TipoIdentificacion.FISICA,
+        tipoIdentificacion: 'FISICA',
         numeroIdentificacion: '2-3456-7890',
         telefono: '+506 6666-6666',
         email: 'carlos@email.com',
@@ -167,7 +167,7 @@ async function main() {
       data: {
         tallerId: taller.id,
         nombreCompleto: 'Empresa ABC S.A.',
-        tipoIdentificacion: TipoIdentificacion.JURIDICA,
+        tipoIdentificacion: 'JURIDICA',
         numeroIdentificacion: '3-102-654321',
         telefono: '+506 2222-2222',
         email: 'contacto@empresaabc.cr',
@@ -185,7 +185,7 @@ async function main() {
         vehicleId: vehicles[0].id,
         clientId: clients[0].id,
         orderNumber: 'ORD-2024-001',
-        status: OrderStatus.BORRADOR,
+        status: 'BORRADOR',
         motivoIngreso: 'Mantenimiento preventivo 45,000 km',
         subtotalCentimos: 4500000,
         ivaCentimos: 585000,
@@ -227,7 +227,7 @@ async function main() {
         statusHistory: {
           create: {
             fromStatus: null,
-            toStatus: OrderStatus.BORRADOR,
+            toStatus: 'BORRADOR',
             notes: 'Orden creada',
           },
         },
@@ -240,7 +240,7 @@ async function main() {
         vehicleId: vehicles[1].id,
         clientId: clients[1].id,
         orderNumber: 'ORD-2024-002',
-        status: OrderStatus.ENVIADA,
+        status: 'ENVIADA',
         motivoIngreso: 'Frenos hacen ruido',
         subtotalCentimos: 10500000,
         ivaCentimos: 1365000,
@@ -280,12 +280,12 @@ async function main() {
           create: [
             {
               fromStatus: null,
-              toStatus: OrderStatus.BORRADOR,
+              toStatus: 'BORRADOR',
               notes: 'Orden creada',
             },
             {
-              fromStatus: OrderStatus.BORRADOR,
-              toStatus: OrderStatus.ENVIADA,
+              fromStatus: 'BORRADOR',
+              toStatus: 'ENVIADA',
               notes: 'Cotización enviada al cliente',
             },
           ],
@@ -299,7 +299,7 @@ async function main() {
         vehicleId: vehicles[2].id,
         clientId: clients[2].id,
         orderNumber: 'ORD-2024-003',
-        status: OrderStatus.APROBADA,
+        status: 'APROBADA',
         motivoIngreso: 'Revisión pre-RTV',
         subtotalCentimos: 6000000,
         ivaCentimos: 780000,
@@ -332,17 +332,17 @@ async function main() {
           create: [
             {
               fromStatus: null,
-              toStatus: OrderStatus.BORRADOR,
+              toStatus: 'BORRADOR',
               notes: 'Orden creada',
             },
             {
-              fromStatus: OrderStatus.BORRADOR,
-              toStatus: OrderStatus.ENVIADA,
+              fromStatus: 'BORRADOR',
+              toStatus: 'ENVIADA',
               notes: 'Cotización enviada',
             },
             {
-              fromStatus: OrderStatus.ENVIADA,
-              toStatus: OrderStatus.APROBADA,
+              fromStatus: 'ENVIADA',
+              toStatus: 'APROBADA',
               notes: 'Cliente aprobó la cotización',
             },
           ],
